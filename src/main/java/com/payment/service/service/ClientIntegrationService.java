@@ -1,7 +1,9 @@
 package com.payment.service.service;
 
 import com.payment.service.dto.request.CreateClientRequest;
+import com.payment.service.dto.request.CreateIssuingContractWithLiabilityRequest;
 import com.payment.service.dto.response.CreateClientResponse;
+import com.payment.service.dto.response.CreateIssuingContractWithLiabilityResponse;
 import com.payment.service.util.XmlParserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +58,24 @@ public class ClientIntegrationService {
 
         log.info("Cập nhật địa chỉ SOAP hoàn tất cho ID: {}. CorrelationID: {}", clientId, correlationId);
         // Optionally parse addressXmlResponse if needed
+    }
+
+    public String createIssuingContractWithLiability(CreateIssuingContractWithLiabilityRequest request) {
+        String correlationId = UUID.randomUUID().toString();
+        log.info("Bắt đầu tạo hợp đồng phát hành với trách nhiệm pháp lý. CorrelationID: {}", correlationId);
+
+        String xmlPayload = payloadBuilderService.buildCreateIssuingContractWithLiabilityPayload(request, correlationId);
+        String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
+
+        CreateIssuingContractWithLiabilityResponse response = XmlParserUtil.parseCreateIssuingContractWithLiabilityResponse(xmlResponse);
+
+        if (!response.isSuccess()) {
+            log.error("Tạo hợp đồng thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
+        } else {
+            log.info("Tạo hợp đồng thành công. CreatedContractID: {}. CorrelationID: {}", response.getCreatedContract(), correlationId);
+        }
+
+        return xmlResponse;
     }
 
     private String sendSoapRequest(String xmlPayload, String correlationId) {

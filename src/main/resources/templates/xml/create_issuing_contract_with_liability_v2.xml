@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsin="http://www.openwaygroup.com/wsint" xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateIssuingContractWithLiabilityV2>
+            <wsin:LiabCategory th:text="${request.liabCategory}">A</wsin:LiabCategory>
+            <wsin:LiabContractSearchMethod th:text="${request.liabContractSearchMethod}">CONTRACT_NUMBER</wsin:LiabContractSearchMethod>
+            <wsin:LiabContractIdentifier th:text="${request.liabContractIdentifier}">001-P-354274</wsin:LiabContractIdentifier>
+            <wsin:ClientSearchMethod th:text="${request.clientSearchMethod}">CLIENT_NUMBER</wsin:ClientSearchMethod>
+            <wsin:ClientIdentifier th:text="${request.clientIdentifier}">1</wsin:ClientIdentifier>
+            <wsin:ProductIdentifier th:text="${request.productIdentifier}">250314000000000000000590</wsin:ProductIdentifier>
+            <wsin:ApplRegNumber th:text="${request.applRegNumber}">REQ-20240504-044</wsin:ApplRegNumber>
+            <wsin:InObject th:if="${request.inObject != null}">
+                <wsin:Branch th:text="${request.inObject.branch}">0101</wsin:Branch>
+                <wsin:InstitutionCode th:text="${request.inObject.institutionCode}">0001</wsin:InstitutionCode>
+                <wsin:Currency th:text="${request.inObject.currency}">810</wsin:Currency>
+                <wsin:ContractName th:text="${request.inObject.contractName}">NGUYEN VAN B</wsin:ContractName>
+                <wsin:AddInfo01 th:text="${request.inObject.addInfo01}">Tag1=Value1;Tag2=Value2</wsin:AddInfo01>
+                <wsin:AddInfo02 th:text="${request.inObject.addInfo02}">Additional Notes</wsin:AddInfo02>
+            </wsin:InObject>
+        </wsin:CreateIssuingContractWithLiabilityV2>
+    </soapenv:Body>
+</soapenv:Envelope>
