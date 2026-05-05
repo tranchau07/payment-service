@@ -1,39 +1,81 @@
 package com.payment.service.dto.request;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateClientRequest {
-    private String reason;
-    private ClientInfo clientInfo;
-    private List<CustomData> customData;
+
+    String reason;
+    ClientInfo clientInfo;
+    AddressInfo addressInfo;
+    List<CustomData> customData;
 
     @Data
-    public static class ClientInfo {
-        private String branchCode;
-        private String clientTypeCode;
-        private String clientCategory;
-        private String productCategory;
-        private String shortName;
-        private String firstName;
-        private String lastName;
-        private String middleName;
-        private String birthDate;
-        private String gender;
-        private String citizenship;
-        private String socialNumber;
-        private String regNumber;
-        private String regNumberType;
-        private String profession;
-        private String email;
-        private String mobilePhone;
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class AddressInfo {
+        String addressType;
+        String country;
+        String city;
+        String addressZip;
+        String state;
+        String addressLine1;
+        String addressLine2;
+        String addressLine3;
+        String addressLine4;
     }
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class ClientInfo {
+        String institutionCode;
+        String branchCode;
+        String clientTypeCode;
+        String shortName;
+        String firstName;
+        String lastName;
+        String middleName;
+        String maritalStatusCode;
+        String socialNumber;
+        String salutationCode;
+        String birthDate;
+        String gender;
+        String citizenship;
+        String individualTaxpayerNumber;
+        String companyName;
+        String identityCardNumber;
+        String identityCardDetails;
+        String clientNumber;
+        String profession;
+        String email;
+        String homePhone;
+        String mobilePhone;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class CustomData {
-        private String tagName;
-        private String tagValue;
+        String addInfoType;
+        String tagName;
+        String tagValue;
     }
 }

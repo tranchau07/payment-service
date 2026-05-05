@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsin="http://www.openwaygroup.com/wsint" xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}"></wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateClientAddressV2>
+            <wsin:ClientSearchMethod>CLIENT_ID</wsin:ClientSearchMethod>
+            <wsin:ClientIdentifier th:text="${clientId}">1</wsin:ClientIdentifier>
+            <wsin:AddressTypeCode th:text="${addressInfo.addressType}">STMT</wsin:AddressTypeCode>
+            <wsin:Reason th:text="${reason}">Create client address</wsin:Reason>
+            <InObject>
+                <City th:text="${addressInfo.city}">Meschede</City>
+                <ZipCode th:text="${addressInfo.addressZip}">***</ZipCode>
+                <Line1 th:text="${addressInfo.addressLine1}">***</Line1>
+                <Line2 th:text="${addressInfo.addressLine2}">***</Line2>
+                <Line3 th:text="${addressInfo.addressLine3}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" th:xsi:nil="${addressInfo.addressLine3 == null}"/>
+                <Line4 th:text="${addressInfo.addressLine4}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" th:xsi:nil="${addressInfo.addressLine4 == null}"/>
+            </InObject>
+        </wsin:CreateClientAddressV2>
+    </soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+        xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:wsin="http://www.openwaygroup.com/wsint"
+        xmlns:th="http://www.thymeleaf.org"> <soapenv:Header>
+    <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+    <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+    <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+</soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateClientV4>
+            <wsin:Reason th:text="${request.reason}">Create client</wsin:Reason>
+            <wsin:CreateClient_InObject>
+                <wsin:InstitutionCode th:text="${request.clientInfo.institutionCode}">0001</wsin:InstitutionCode>
+                <wsin:Branch th:text="${request.clientInfo.branchCode}">0101</wsin:Branch>
+                <wsin:ClientTypeCode th:text="${request.clientInfo.clientTypeCode}">PR</wsin:ClientTypeCode>
+                <wsin:ShortName th:text="${request.clientInfo.shortName}">Truong Ha Anh</wsin:ShortName>
+                <wsin:FirstName th:text="${request.clientInfo.firstName}">Anh</wsin:FirstName>
+                <wsin:LastName th:text="${request.clientInfo.lastName}">Truong</wsin:LastName>
+                <wsin:MiddleName th:text="${request.clientInfo.middleName}">Ha</wsin:MiddleName>
+                <wsin:MaritalStatusCode th:text="${request.clientInfo.maritalStatusCode}">D</wsin:MaritalStatusCode>
+                <wsin:SocialSecurityNumber th:text="${request.clientInfo.socialNumber}">234550004322</wsin:SocialSecurityNumber>
+                <wsin:SalutationCode th:text="${request.clientInfo.salutationCode}">MR</wsin:SalutationCode>
+                <wsin:BirthDate th:text="${request.clientInfo.birthDate}">2000-12-12</wsin:BirthDate>
+                <wsin:Gender th:text="${request.clientInfo.gender}">F</wsin:Gender>
+                <wsin:Citizenship th:text="${request.clientInfo.citizenship}">VNM</wsin:Citizenship>
+                <wsin:IndividualTaxpayerNumber th:text="${request.clientInfo.individualTaxpayerNumber}">43245663132</wsin:IndividualTaxpayerNumber>
+                <wsin:CompanyName th:text="${request.clientInfo.companyName}">OpenWay</wsin:CompanyName>
+                <wsin:IdentityCardNumber th:text="${request.clientInfo.identityCardNumber}">09977655443</wsin:IdentityCardNumber>
+                <wsin:IdentityCardDetails th:text="${request.clientInfo.identityCardDetails}">232445213hanoi</wsin:IdentityCardDetails>
+                <wsin:ClientNumber th:text="${request.clientInfo.clientNumber}">0997732455345</wsin:ClientNumber>
+                <wsin:Profession th:text="${request.clientInfo.profession}">Thu Ky</wsin:Profession>
+                <wsin:EMail th:text="${request.clientInfo.email}">linhdt@gmail.com</wsin:EMail>
+                <wsin:HomePhone th:text="${request.clientInfo.homePhone}">0875433001</wsin:HomePhone>
+                <wsin:MobilePhone th:text="${request.clientInfo.mobilePhone}">087543002</wsin:MobilePhone>
+            </wsin:CreateClient_InObject>
+
+            <wsin:SetCustomData_InObject th:each="data : ${request.customData}">
+                <wsin:AddInfoType th:text="${data.addInfoType}">AddInfo01</wsin:AddInfoType>
+                <wsin:TagName th:text="${data.tagName}">PrevID</wsin:TagName>
+                <wsin:TagValue th:text="${data.tagValue}">A1</wsin:TagValue>
+            </wsin:SetCustomData_InObject>
+        </wsin:CreateClientV4>
+    </soapenv:Body>
+</soapenv:Envelope>
