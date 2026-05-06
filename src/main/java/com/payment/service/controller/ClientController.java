@@ -2,10 +2,11 @@ package com.payment.service.controller;
 
 import com.payment.service.dto.request.ClientSearchRequest;
 import com.payment.service.dto.request.CreateClientRequest;
-import com.payment.service.dto.request.CreateIssuingContractWithLiabilityRequest;
 import com.payment.service.dto.response.ClientListResponse;
+import com.payment.service.dto.response.ClientResponse;
 import com.payment.service.service.ClientIntegrationService;
 import com.payment.service.service.ClientService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,20 +44,6 @@ public class ClientController {
         }
     }
 
-    @PostMapping("/issuing-contract-liability")
-    public ResponseEntity<String> createIssuingContractWithLiability(@RequestBody CreateIssuingContractWithLiabilityRequest request) {
-        try {
-            String xmlResponse = clientIntegrationService.createIssuingContractWithLiability(request);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .header("Content-Type", "application/xml; charset=UTF-8")
-                    .body(xmlResponse);
-        } catch (Exception e) {
-            log.error("Tạo hợp đồng phát hành thất bại: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("<error>Có lỗi xảy ra trong quá trình tạo hợp đồng phát hành.</error>");
-        }
-    }
-
     @GetMapping
     public ResponseEntity<ClientListResponse> searchClients(
             ClientSearchRequest searchRequest,
@@ -67,6 +54,12 @@ public class ClientController {
         ClientListResponse response = clientService.searchClients(searchRequest, pageable);
         
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientResponse> getClientById(@PathVariable Long id) {
+        log.info("Received request to find client with ID: {}", id);
+        return ResponseEntity.ok(clientService.getClientById(id));
     }
 
     @PutMapping("/{id}/address")

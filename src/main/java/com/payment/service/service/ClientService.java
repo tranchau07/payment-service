@@ -3,6 +3,7 @@ package com.payment.service.service;
 import com.payment.service.dto.request.ClientSearchRequest;
 import com.payment.service.dto.request.CreateClientRequest;
 import com.payment.service.dto.response.ClientListResponse;
+import com.payment.service.dto.response.ClientResponse;
 import com.payment.service.entity.Client;
 import com.payment.service.mapper.ClientMapper;
 import com.payment.service.repository.ClientRepository;
@@ -39,6 +40,14 @@ public class ClientService {
 
         log.info("Found {} clients", clientPage.getTotalElements());
         return clientMapper.toListResponse(clientPage);
+    }
+
+    @Transactional(readOnly = true)
+    public ClientResponse getClientById(Long id) {
+        log.info("Fetching client with ID: {}", id);
+        return clientRepository.findById(id)
+                .map(clientMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Client not found with ID: " + id));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

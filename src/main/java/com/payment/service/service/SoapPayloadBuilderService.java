@@ -1,7 +1,6 @@
 package com.payment.service.service;
 
 import com.payment.service.dto.request.CreateClientRequest;
-import com.payment.service.dto.request.CreateIssuingContractWithLiabilityRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -43,15 +42,5 @@ public class SoapPayloadBuilderService {
         context.setVariable("correlationId", correlationId);
 
         return xmlTemplateEngine.process("create_client_address_v2", context);
-    }
-
-    public String buildCreateIssuingContractWithLiabilityPayload(CreateIssuingContractWithLiabilityRequest request, String correlationId) {
-        Context context = new Context();
-        context.setVariable("request", request);
-        context.setVariable("sessionContextStr", "?");
-        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
-        context.setVariable("correlationId", correlationId);
-
-        return xmlTemplateEngine.process("create_issuing_contract_with_liability_v2", context);
     }
 }

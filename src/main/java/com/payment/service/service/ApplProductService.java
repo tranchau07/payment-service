@@ -21,8 +21,8 @@ public class ApplProductService {
     ApplProductMapper applProductMapper;
 
     public List<ApplProductResponse> getAllProducts() {
-        log.info("Fetching all products from APPL_PRODUCT");
-        return applProductMapper.toResponses(applProductRepository.findAll());
+        log.info("Fetching all products from APPL_PRODUCT with IS_READY='Y' and AMND_STATE='A'");
+        return applProductMapper.toResponses(applProductRepository.findAllByIsReadyAndAmndState("Y", "A"));
     }
 
     public ApplProductResponse getProductByCode(String code) {

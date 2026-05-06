@@ -13,8 +13,8 @@ spring:
         max-page-size: 10000
 
   datasource:
-    url: jdbc:oracle:thin:@//10.145.48.97:1521/way4db
-    username: INTN
+    url: jdbc:oracle:thin:@10.145.48.96:1521:way4db
+    username: INT
     password: way4
     driver-class-name: oracle.jdbc.OracleDriver
 

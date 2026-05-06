@@ -149,6 +149,12 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<sources>
+						<source>src/main/resources/WSDL/way4.wsdl</source>
+					</sources>
+					<sourceType>wsdl</sourceType>
+				</configuration>
 			</plugin>
 
 			<plugin>
