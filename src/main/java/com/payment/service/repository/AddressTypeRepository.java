@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AddressTypeRepository extends JpaRepository<AddressType, Long> {
-    Optional<AddressType> findByCode(String code);
+public interface AddressTypeRepository extends BaseRepository<AddressType, Long> {
 }

@@ -1,7 +1,9 @@
 package com.payment.service.service;
 
 import com.payment.service.dto.response.BranchResponse;
+import com.payment.service.entity.Branch;
 import com.payment.service.mapper.BranchMapper;
+import com.payment.service.repository.BaseRepository;
 import com.payment.service.repository.BranchRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +17,30 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Slf4j
-public class BranchService {
+public class BranchService extends BaseCatalogService<Branch, BranchResponse> {
     BranchRepository branchRepository;
     BranchMapper branchMapper;
 
+    @Override
+    protected BaseRepository<Branch, Long> getRepository() {
+        return branchRepository;
+    }
+
+    @Override
+    protected BranchResponse toResponse(Branch entity) {
+        return branchMapper.toBranchResponse(entity);
+    }
+
+    @Override
+    protected String getEntityName() {
+        return "Branch";
+    }
+
     public BranchResponse getBranchByCode(String code) {
-        log.info("Getting by code: {}", code);
-        return branchMapper.toBranchResponse(branchRepository.findByCode(code).orElseThrow(RuntimeException::new
-                ));
+        return getByCode(code);
     }
 
     public List<BranchResponse> getAllSa() {
-        return branchMapper.toBranchResponses(branchRepository.findAll());
+        return getAll();
     }
 }

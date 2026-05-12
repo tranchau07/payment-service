@@ -23,13 +23,15 @@ public class ClientIntegrationService {
     private final SoapPayloadBuilderService payloadBuilderService;
     private final RestTemplate restTemplate;
 
-    private static final String SOAP_ENDPOINT = "http://10.145.48.222:17000/webservice_int/ws";
+    @org.springframework.beans.factory.annotation.Value("${soap.webservice.url}")
+    private String soapEndpoint;
 
     @Transactional(rollbackFor = Exception.class)
-    public String registerClientToCore(CreateClientRequest request) {
+    public CreateClientResponse registerClientToCore(CreateClientRequest request) {
         String correlationId = UUID.randomUUID().toString();
         log.info("Bắt đầu xử lý đăng ký khách hàng. CorrelationID: {}", correlationId);
 
+        // 1. Gửi request tạo Client
         String clientXmlPayload = payloadBuilderService.buildCreateClientPayload(request, correlationId);
         String clientXmlResponse = sendSoapRequest(clientXmlPayload, correlationId);
         
@@ -37,15 +39,25 @@ public class ClientIntegrationService {
         
         if (!clientResponse.isSuccess()) {
             log.error("Tạo khách hàng thất bại: {}. CorrelationID: {}", clientResponse.getRetMsg(), correlationId);
-            return clientXmlResponse;
+            return clientResponse;
         }
 
         log.info("Tạo khách hàng thành công. NewClientID: {}. CorrelationID: {}", clientResponse.getNewClientId(), correlationId);
 
+        // 2. Cập nhật địa chỉ (nếu có trong request)
         if (request.getAddressInfo() != null) {
-            updateClientAddressViaSoap(request.getAddressInfo(), request.getReason(), String.valueOf(clientResponse.getNewClientId()), correlationId);
+            try {
+                updateClientAddressViaSoap(request.getAddressInfo(), request.getReason(), String.valueOf(clientResponse.getNewClientId()), correlationId);
+                clientResponse.setAddressUpdateStatus("SUCCESS");
+            } catch (Exception e) {
+                log.error("Lỗi khi cập nhật địa chỉ cho Client ID: {}. Lỗi: {}", clientResponse.getNewClientId(), e.getMessage());
+                clientResponse.setAddressUpdateStatus("FAILED: " + e.getMessage());
+            }
+        } else {
+            clientResponse.setAddressUpdateStatus("SKIPPED");
         }
-        return clientXmlResponse;
+
+        return clientResponse;
     }
 
     public void updateClientAddressViaSoap(CreateClientRequest.AddressInfo addressInfo, String reason, String clientId, String correlationId) {
@@ -54,8 +66,8 @@ public class ClientIntegrationService {
         String addressXmlPayload = payloadBuilderService.buildCreateClientAddressPayload(addressInfo, reason, clientId, correlationId);
         String addressXmlResponse = sendSoapRequest(addressXmlPayload, correlationId);
 
+        // Parse response địa chỉ nếu cần validate chi tiết, ở đây tạm thời coi là xong nếu không throw exception
         log.info("Cập nhật địa chỉ SOAP hoàn tất cho ID: {}. CorrelationID: {}", clientId, correlationId);
-        // Optionally parse addressXmlResponse if needed
     }
 
     private String sendSoapRequest(String xmlPayload, String correlationId) {
@@ -66,7 +78,7 @@ public class ClientIntegrationService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    SOAP_ENDPOINT,
+                    soapEndpoint,
                     httpEntity,
                     String.class
             );
@@ -76,7 +88,7 @@ public class ClientIntegrationService {
 
         } catch (Exception e) {
             log.error("Lỗi khi kết nối SOAP cho CorrelationID: {}. Lỗi: {}", correlationId, e.getMessage());
-            throw new RuntimeException("Lỗi tích hợp hệ thống Core", e);
+            throw new RuntimeException("Lỗi tích hợp hệ thống Core: " + e.getMessage(), e);
         }
     }
 }

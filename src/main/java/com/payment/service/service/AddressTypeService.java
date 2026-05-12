@@ -1,8 +1,10 @@
 package com.payment.service.service;
 
 import com.payment.service.dto.response.AddressTypeResponse;
+import com.payment.service.entity.AddressType;
 import com.payment.service.mapper.AddressTypeMapper;
 import com.payment.service.repository.AddressTypeRepository;
+import com.payment.service.repository.BaseRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,17 +17,31 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Slf4j
-public class AddressTypeService {
+public class AddressTypeService extends BaseCatalogService<AddressType, AddressTypeResponse> {
     AddressTypeRepository addressTypeRepository;
     AddressTypeMapper addressTypeMapper;
 
+    @Override
+    protected BaseRepository<AddressType, Long> getRepository() {
+        return addressTypeRepository;
+    }
+
+    @Override
+    protected AddressTypeResponse toResponse(AddressType entity) {
+        return addressTypeMapper.toAddressTypeResponse(entity);
+    }
+
+    @Override
+    protected String getEntityName() {
+        return "AddressType";
+    }
+
+    // Keep original method names if needed for compatibility, or just use inherited ones
     public AddressTypeResponse getAddressTypeByCode(String code) {
-        log.info("Getting by code: {}", code);
-        return addressTypeMapper.toAddressTypeResponse(addressTypeRepository.findByCode(code).orElseThrow(RuntimeException::new
-                ));
+        return getByCode(code);
     }
 
     public List<AddressTypeResponse> getAllSa() {
-        return addressTypeMapper.toAddressTypeResponses(addressTypeRepository.findAll());
+        return getAll();
     }
 }

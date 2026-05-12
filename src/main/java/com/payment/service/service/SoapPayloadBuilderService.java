@@ -22,12 +22,11 @@ public class SoapPayloadBuilderService {
         Context context = new Context();
 
         context.setVariable("request", request);
-        context.setVariable("sessionContextStr", "?");
+        context.setVariable("sessionContextStr", ""); 
         context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
-        context.setVariable("correlationId", "?");
+        context.setVariable("correlationId", correlationId);
 
-        log.info("REQUEST = {}", request);
-        log.info("CLIENT INFO = {}", request.getClientInfo());
+        log.info("Building SOAP payload for Client Registration. CorrelationID: {}", correlationId);
 
         return xmlTemplateEngine.process("create_client_v4", context);
     }

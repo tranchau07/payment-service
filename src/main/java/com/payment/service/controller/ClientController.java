@@ -4,6 +4,7 @@ import com.payment.service.dto.request.ClientSearchRequest;
 import com.payment.service.dto.request.CreateClientRequest;
 import com.payment.service.dto.response.ClientListResponse;
 import com.payment.service.dto.response.ClientResponse;
+import com.payment.service.dto.response.CreateClientResponse;
 import com.payment.service.service.ClientIntegrationService;
 import com.payment.service.service.ClientService;
 import jakarta.validation.Valid;
@@ -30,17 +31,21 @@ public class ClientController {
     ClientService clientService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerClient( @RequestBody CreateClientRequest request) {
-
+    public ResponseEntity<?> registerClient(@RequestBody CreateClientRequest request) {
+        log.info(request.toString());
         try {
-            String xmlResponse = clientIntegrationService.registerClientToCore(request);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .header("Content-Type", "application/xml; charset=UTF-8")
-                    .body(xmlResponse);
+            CreateClientResponse response = clientIntegrationService.registerClientToCore(request);
+            
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
         } catch (Exception e) {
             log.error("Xử lý đăng ký khách hàng thất bại: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("<error>Có lỗi xảy ra trong quá trình tích hợp hệ thống.</error>");
+                    .body("Có lỗi xảy ra trong quá trình tích hợp hệ thống: " + e.getMessage());
         }
     }
 

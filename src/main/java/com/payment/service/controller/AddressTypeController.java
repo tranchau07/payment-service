@@ -16,16 +16,11 @@ import java.util.List;
 @RequestMapping("/addressTypes")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AddressTypeController {
+public class AddressTypeController extends BaseCatalogController<AddressTypeResponse, AddressTypeService> {
     AddressTypeService addressTypeService;
 
-    @GetMapping("/{code}")
-    AddressTypeResponse getLangByCode(@PathVariable("code") String code) {
-        return addressTypeService.getAddressTypeByCode(code);
-    }
-
-    @GetMapping("")
-    List<AddressTypeResponse> getAllLang() {
-        return addressTypeService.getAllSa();
+    @Override
+    protected AddressTypeService getService() {
+        return addressTypeService;
     }
 }

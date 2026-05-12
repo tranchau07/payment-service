@@ -1,7 +1,9 @@
 package com.payment.service.service;
 
 import com.payment.service.dto.response.CountryResponse;
+import com.payment.service.entity.Country;
 import com.payment.service.mapper.CountryMapper;
+import com.payment.service.repository.BaseRepository;
 import com.payment.service.repository.CountryRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +17,30 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Slf4j
-public class CountryService {
+public class CountryService extends BaseCatalogService<Country, CountryResponse> {
     CountryRepository countryRepository;
     CountryMapper countryMapper;
 
+    @Override
+    protected BaseRepository<Country, Long> getRepository() {
+        return countryRepository;
+    }
+
+    @Override
+    protected CountryResponse toResponse(Country entity) {
+        return countryMapper.toCountryResponse(entity);
+    }
+
+    @Override
+    protected String getEntityName() {
+        return "Country";
+    }
+
     public CountryResponse getCountryByCode(String code) {
-        log.info("Getting by code: {}", code);
-        return countryMapper.toCountryResponse(countryRepository.findByCode(code).orElseThrow(RuntimeException::new
-                ));
+        return getByCode(code);
     }
 
     public List<CountryResponse> getAllSa() {
-        return countryMapper.toCountryResponses(countryRepository.findAll());
+        return getAll();
     }
 }

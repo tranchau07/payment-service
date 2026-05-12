@@ -16,16 +16,11 @@ import java.util.List;
 @RequestMapping("/branches")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class BranchController {
+public class BranchController extends BaseCatalogController<BranchResponse, BranchService> {
     BranchService branchService;
 
-    @GetMapping("/{code}")
-    BranchResponse getLangByCode(@PathVariable("code") String code) {
-        return branchService.getBranchByCode(code);
-    }
-
-    @GetMapping("")
-    List<BranchResponse> getAllLang() {
-        return branchService.getAllSa();
+    @Override
+    protected BranchService getService() {
+        return branchService;
     }
 }

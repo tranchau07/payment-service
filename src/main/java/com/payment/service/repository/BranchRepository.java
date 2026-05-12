@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface BranchRepository extends JpaRepository<Branch, Long> {
-    Optional<Branch> findByCode(String code);
+public interface BranchRepository extends BaseRepository<Branch, Long> {
 }

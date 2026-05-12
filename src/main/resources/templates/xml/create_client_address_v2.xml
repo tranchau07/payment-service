@@ -19,10 +19,12 @@
                 <ZipCode th:text="${addressInfo.addressZip}">***</ZipCode>
                 <Line1 th:text="${addressInfo.addressLine1}">***</Line1>
                 <Line2 th:text="${addressInfo.addressLine2}">***</Line2>
-                <Line3 th:text="${addressInfo.addressLine3}"
-                       th:attr="xsi:nil=${addressInfo.addressLine3 == null ? 'true' : null}"/>
-                <Line4 th:text="${addressInfo.addressLine4}"
-                       th:attr="xsi:nil=${addressInfo.addressLine4 == null ? 'true' : null}"/>
+                <!-- Dùng th:if/th:unless để tránh lỗi parse toán tử ? trong th:attr -->
+                <Line3 th:if="${addressInfo.addressLine3 != null}" th:text="${addressInfo.addressLine3}"/>
+                <Line3 th:if="${addressInfo.addressLine3 == null}" xsi:nil="true"/>
+                
+                <Line4 th:if="${addressInfo.addressLine4 != null}" th:text="${addressInfo.addressLine4}"/>
+                <Line4 th:if="${addressInfo.addressLine4 == null}" xsi:nil="true"/>
             </InObject>
         </wsin:CreateClientAddressV2>
     </soapenv:Body>

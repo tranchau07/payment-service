@@ -16,16 +16,11 @@ import java.util.List;
 @RequestMapping("/countries")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CountryController {
+public class CountryController extends BaseCatalogController<CountryResponse, CountryService> {
     CountryService countryService;
 
-    @GetMapping("/{code}")
-    CountryResponse getLangByCode(@PathVariable("code") String code) {
-        return countryService.getCountryByCode(code);
-    }
-
-    @GetMapping("")
-    List<CountryResponse> getAllLang() {
-        return countryService.getAllSa();
+    @Override
+    protected CountryService getService() {
+        return countryService;
     }
 }

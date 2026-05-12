@@ -19,6 +19,9 @@ public class CreateClientResponse {
     String debugInfo;
     String resultInfo;
 
+    // Trạng thái cập nhật địa chỉ (nếu có)
+    String addressUpdateStatus;
+
     public boolean isSuccess() {
         return retCode != null && retCode == 0;
     }
