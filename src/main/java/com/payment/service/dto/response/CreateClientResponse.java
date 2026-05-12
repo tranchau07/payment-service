@@ -22,6 +22,9 @@ public class CreateClientResponse {
     // Trạng thái cập nhật địa chỉ (nếu có)
     String addressUpdateStatus;
 
+    // Trạng thái tạo hợp đồng (tự động sau khi tạo client)
+    String contractCreationStatus;
+
     public boolean isSuccess() {
         return retCode != null && retCode == 0;
     }

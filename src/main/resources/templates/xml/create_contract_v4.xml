@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+        xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:wsin="http://www.openwaygroup.com/wsint"
+        xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateContractV4>
+            <wsin:ClientSearchMethod th:text="${clientSearchMethod}">CLIENT_ID</wsin:ClientSearchMethod>
+            <wsin:ClientIdentifier th:text="${clientIdentifier}">94100</wsin:ClientIdentifier>
+            <wsin:Reason th:text="${reason}">create Contract</wsin:Reason>
+            <wsin:CreateContract_InObject>
+                <wsin:Branch th:text="${branch}">0101</wsin:Branch>
+                <wsin:InstitutionCode th:text="${institutionCode}">0001</wsin:InstitutionCode>
+                <wsin:ProductCode th:text="${productCode}">LIAB_TRAINING01</wsin:ProductCode>
+                <wsin:ProductCode2></wsin:ProductCode2>
+                <wsin:ProductCode3></wsin:ProductCode3>
+                <wsin:ContractName th:text="${contractName}">Liability Contract</wsin:ContractName>
+                <wsin:CBSNumber th:text="${cbsNumber}">21324556600</wsin:CBSNumber>
+            </wsin:CreateContract_InObject>
+            <wsin:SetCustomData_InObject>
+                <!-- Empty as in example, can be extended later if needed -->
+            </wsin:SetCustomData_InObject>
+        </wsin:CreateContractV4>
+    </soapenv:Body>
+</soapenv:Envelope>

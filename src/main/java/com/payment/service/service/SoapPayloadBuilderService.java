@@ -42,4 +42,25 @@ public class SoapPayloadBuilderService {
 
         return xmlTemplateEngine.process("create_client_address_v2", context);
     }
+
+    public String buildCreateContractPayload(CreateClientRequest clientRequest, Long clientId, String correlationId) {
+        Context context = new Context();
+        context.setVariable("sessionContextStr", "");
+        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
+        context.setVariable("correlationId", correlationId);
+        
+        context.setVariable("clientSearchMethod", "CLIENT_ID");
+        context.setVariable("clientIdentifier", clientId);
+        context.setVariable("reason", "create Contract");
+        
+        context.setVariable("branch", clientRequest.getClientInfo().getBranchCode());
+        context.setVariable("institutionCode", clientRequest.getClientInfo().getInstitutionCode());
+        context.setVariable("productCode", "LIAB_TRAINING01");
+        context.setVariable("contractName", "Liability Contract");
+        context.setVariable("cbsNumber", "21324556600");
+
+        log.info("Building SOAP payload for Contract Creation. CorrelationID: {}", correlationId);
+
+        return xmlTemplateEngine.process("create_contract_v4", context);
+    }
 }
