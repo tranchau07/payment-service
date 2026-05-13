@@ -1,8 +1,10 @@
 package com.payment.service.service;
 
 import com.payment.service.dto.request.CreateClientRequest;
+import com.payment.service.dto.request.CreateIssuingContractWithLiabilityRequest;
 import com.payment.service.dto.response.CreateClientResponse;
 import com.payment.service.dto.response.CreateContractResponse;
+import com.payment.service.dto.response.CreateIssuingContractWithLiabilityResponse;
 import com.payment.service.util.XmlParserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +93,16 @@ public class ClientIntegrationService {
         String contractXmlPayload = payloadBuilderService.buildCreateContractPayload(request, clientId, correlationId);
         String contractXmlResponse = sendSoapRequest(contractXmlPayload, correlationId);
         return XmlParserUtil.parseCreateContractResponse(contractXmlResponse);
+    }
+
+    public CreateIssuingContractWithLiabilityResponse createIssuingContractWithLiability(CreateIssuingContractWithLiabilityRequest request) {
+        String correlationId = UUID.randomUUID().toString();
+        log.info("Bắt đầu tạo hợp đồng Issuing với Liability. CorrelationID: {}", correlationId);
+
+        String xmlPayload = payloadBuilderService.buildCreateIssuingContractWithLiabilityPayload(request, correlationId);
+        String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
+
+        return XmlParserUtil.parseCreateIssuingContractWithLiabilityResponse(xmlResponse);
     }
 
     private String sendSoapRequest(String xmlPayload, String correlationId) {

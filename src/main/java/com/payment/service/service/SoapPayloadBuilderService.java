@@ -63,4 +63,19 @@ public class SoapPayloadBuilderService {
 
         return xmlTemplateEngine.process("create_contract_v4", context);
     }
+
+    public String buildCreateIssuingContractWithLiabilityPayload(com.payment.service.dto.request.CreateIssuingContractWithLiabilityRequest request, String correlationId) {
+        Context context = new Context();
+        context.setVariable("sessionContextStr", "");
+        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
+        context.setVariable("correlationId", correlationId);
+
+        context.setVariable("liabContractSearchMethod", "CONTRACT_NUMBER");
+        context.setVariable("clientSearchMethod", "CLIENT_ID");
+        context.setVariable("request", request);
+
+        log.info("Building SOAP payload for CreateIssuingContractWithLiability. CorrelationID: {}", correlationId);
+
+        return xmlTemplateEngine.process("create_issuing_contract_with_liability_v2", context);
+    }
 }

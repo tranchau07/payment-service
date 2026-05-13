@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                 xmlns:wsin="http://www.openwaygroup.com/wsint"
+                 xmlns:th="http://www.thymeleaf.org">
+   <soapenv:Header>
+      <wsin:SessionContextStr th:text="${sessionContextStr}"></wsin:SessionContextStr>
+      <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+      <wsin:CorrelationId th:text="${correlationId}"></wsin:CorrelationId>
+   </soapenv:Header>
+   <soapenv:Body>
+      <wsin:CreateIssuingContractWithLiabilityV2>
+      <wsin:LiabCategory>Y</wsin:LiabCategory>
+      <wsin:LiabContractSearchMethod th:text="${liabContractSearchMethod}">CONTRACT_NUMBER</wsin:LiabContractSearchMethod>
+      <wsin:LiabContractIdentifier th:text="${request.liabContractIdentifier}">001-P-789859</wsin:LiabContractIdentifier>
+         <wsin:ClientSearchMethod th:text="${clientSearchMethod}">CLIENT_ID</wsin:ClientSearchMethod>
+         <wsin:ClientIdentifier th:text="${request.clientIdentifier}">94520</wsin:ClientIdentifier>
+         <wsin:ProductCode th:text="${request.productCode}">ISSUING_TRAINING01</wsin:ProductCode>
+         <wsin:ProductCode2 th:text="${request.productCode2}"></wsin:ProductCode2>
+          <wsin:ProductCode3 th:text="${request.productCode3}"></wsin:ProductCode3>
+         <wsin:InObject>
+            <wsin:Branch th:text="${request.branch}">0101</wsin:Branch>
+            <wsin:InstitutionCode th:text="${request.institutionCode}">0001</wsin:InstitutionCode>
+            <wsin:ContractName th:text="${request.contractName}">Issuing Contract</wsin:ContractName>
+            <wsin:CBSNumber th:text="${request.cbsNumber}">213245566000</wsin:CBSNumber>
+            <wsin:AddInfo01 th:text="${request.addInfo01}">PAYMENT_OPTION=MTP;START_DATE=0123;BANK=A1;ACCOUNT=A2;BANK_CODE=A3;ACC_NAME=A4;</wsin:AddInfo01>
+            <wsin:AddInfo02 th:text="${request.addInfo02}">PAYMENT_OPTION=MTP;</wsin:AddInfo02>
+         </wsin:InObject>  
+      </wsin:CreateIssuingContractWithLiabilityV2>
+   </soapenv:Body>
+</soapenv:Envelope>
