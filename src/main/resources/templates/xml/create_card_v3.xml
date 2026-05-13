@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:wsin="http://www.openwaygroup.com/wsint"
+                  xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateCardV3>
+            <wsin:ContractSearchMethod th:text="${contractSearchMethod}">CONTRACT_NUMBER</wsin:ContractSearchMethod>
+            <wsin:ContractIdentifier th:text="${request.contractIdentifier}">001-P-796589</wsin:ContractIdentifier>
+            <wsin:ProductCode th:text="${request.productCode}">CARD_TRAINING01</wsin:ProductCode>
+            <wsin:ProductCode2></wsin:ProductCode2>
+            <wsin:ProductCode3></wsin:ProductCode3>
+            <wsin:InObject>
+                <wsin:CardName th:text="${request.inObject.cardName}">Card Contract</wsin:CardName>
+                <wsin:Branch th:text="${request.inObject.branch}">0101</wsin:Branch>
+                <wsin:CBSNumber th:text="${request.inObject.cbsNumber}"></wsin:CBSNumber>
+                <wsin:EmbossedFirstName th:text="${request.inObject.embossedFirstName}">Phan</wsin:EmbossedFirstName>
+                <wsin:EmbossedLastName th:text="${request.inObject.embossedLastName}">Hong</wsin:EmbossedLastName>
+                <wsin:EmbossedCompanyName th:text="${request.inObject.embossedCompanyName}">OpenWay</wsin:EmbossedCompanyName>
+            </wsin:InObject>
+        </wsin:CreateCardV3>
+    </soapenv:Body>
+</soapenv:Envelope>
