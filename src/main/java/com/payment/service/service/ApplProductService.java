@@ -31,4 +31,9 @@ public class ApplProductService {
                 .map(applProductMapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("Product not found with code: " + code));
     }
+
+    public List<ApplProductResponse> getProductsByParentCode(String parentCode) {
+        log.info("Fetching products with parentCode: {}", parentCode);
+        return applProductMapper.toResponses(applProductRepository.findAllByParentCode(parentCode));
+    }
 }

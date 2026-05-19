@@ -12,4 +12,5 @@ public interface ApplProductRepository extends JpaRepository<ApplProduct, Long> 
     Optional<ApplProduct> findByCode(String code);
     Optional<ApplProduct> findByInternalCode(String code);
     List<ApplProduct> findAllByIsReadyAndAmndState(String isReady, String amndState);
+    List<ApplProduct> findAllByParentCode(String parentCode);
 }

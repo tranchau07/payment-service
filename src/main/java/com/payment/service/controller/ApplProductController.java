@@ -26,4 +26,9 @@ public class ApplProductController {
     public ApplProductResponse getProductByCode(@PathVariable String code) {
         return applProductService.getProductByCode(code);
     }
+
+    @GetMapping("/parent/{parentCode}")
+    public List<ApplProductResponse> getProductsByParentCode(@PathVariable String parentCode) {
+        return applProductService.getProductsByParentCode(parentCode);
+    }
 }
