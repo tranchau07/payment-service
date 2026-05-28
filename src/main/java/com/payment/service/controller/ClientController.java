@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@PreAuthorize("hasAnyRole('TELLER', 'SUPERVISOR', 'ADMIN')")
 public class ClientController {
 
 
@@ -31,22 +33,9 @@ public class ClientController {
     ClientService clientService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerClient(@RequestBody CreateClientRequest request) {
-        log.info(request.toString());
-        try {
-            CreateClientResponse response = clientIntegrationService.registerClientToCore(request);
-            
-            if (response.isSuccess()) {
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            
-        } catch (Exception e) {
-            log.error("Xử lý đăng ký khách hàng thất bại: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Có lỗi xảy ra trong quá trình tích hợp hệ thống: " + e.getMessage());
-        }
+    public CreateClientResponse registerClient(@jakarta.validation.Valid @RequestBody CreateClientRequest request) {
+        log.info("Request to register client: {}", request);
+        return clientIntegrationService.registerClientToCore(request);
     }
 
     @GetMapping
@@ -68,18 +57,12 @@ public class ClientController {
     }
 
     @PutMapping("/{id}/address")
-    public ResponseEntity<String> updateClientAddress(
+    public String updateClientAddress(
             @PathVariable Long id,
             @RequestBody CreateClientRequest.AddressInfo addressInfo) {
 
         String correlationId = java.util.UUID.randomUUID().toString();
-        try {
-            clientIntegrationService.updateClientAddressViaSoap(addressInfo, "Manual address update", String.valueOf(id), correlationId);
-            return ResponseEntity.ok("Address update requested via SOAP successfully");
-        } catch (Exception e) {
-            log.error("Failed to update address via SOAP for client ID: {}. Error: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to update address via SOAP: " + e.getMessage());
-        }
+        clientIntegrationService.updateClientAddressViaSoap(addressInfo, "Manual address update", String.valueOf(id), correlationId);
+        return "Address update requested via SOAP successfully";
     }
 }

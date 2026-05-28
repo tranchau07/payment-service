@@ -7,12 +7,14 @@ import com.payment.service.service.ContractService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/contracts")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@PreAuthorize("hasAnyRole('TELLER', 'SUPERVISOR', 'ADMIN')")
 public class ContractController {
 
     ContractService contractService;

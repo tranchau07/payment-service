@@ -33,7 +33,17 @@ public class CardIntegrationService {
         String xmlPayload = payloadBuilderService.buildCreateCardPayload(request, correlationId);
         String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
 
-        return XmlParserUtil.parseCreateCardResponse(xmlResponse);
+        CreateCardResponse response = XmlParserUtil.parseCreateCardResponse(xmlResponse);
+        if (!response.isSuccess()) {
+            log.error("Tạo thẻ thất bại từ Core: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CARD_CREATION_FAILED, 
+                correlationId, 
+                "Tạo thẻ thất bại từ Core: " + response.getRetMsg(),
+                response.getRetMsg()
+            );
+        }
+        return response;
     }
 
     private String sendSoapRequest(String xmlPayload, String correlationId) {

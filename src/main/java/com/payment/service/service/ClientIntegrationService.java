@@ -42,7 +42,12 @@ public class ClientIntegrationService {
         
         if (!clientResponse.isSuccess()) {
             log.error("Tạo khách hàng thất bại: {}. CorrelationID: {}", clientResponse.getRetMsg(), correlationId);
-            return clientResponse;
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CLIENT_CREATION_FAILED, 
+                correlationId, 
+                "Tạo khách hàng thất bại: " + clientResponse.getRetMsg(),
+                clientResponse.getRetMsg()
+            );
         }
 
         log.info("Tạo khách hàng thành công. NewClientID: {}. CorrelationID: {}", clientResponse.getNewClientId(), correlationId);
@@ -69,11 +74,23 @@ public class ClientIntegrationService {
                 clientResponse.setContractCreationStatus("SUCCESS: " + contractResponse.getContractNumber());
             } else {
                 log.error("Tạo hợp đồng thất bại cho Client ID: {}. Lỗi: {}", clientResponse.getNewClientId(), contractResponse.getRetMsg());
-                clientResponse.setContractCreationStatus("FAILED: " + contractResponse.getRetMsg());
+                throw new com.payment.service.exception.AppException(
+                    com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED, 
+                    correlationId, 
+                    "Tạo hợp đồng thất bại: " + contractResponse.getRetMsg(),
+                    contractResponse.getRetMsg()
+                );
             }
+        } catch (com.payment.service.exception.AppException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Lỗi hệ thống khi tạo hợp đồng cho Client ID: {}. Lỗi: {}", clientResponse.getNewClientId(), e.getMessage());
-            clientResponse.setContractCreationStatus("ERROR: " + e.getMessage());
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED, 
+                correlationId, 
+                "Lỗi hệ thống khi tạo hợp đồng: " + e.getMessage(),
+                e.getMessage()
+            );
         }
 
         return clientResponse;
@@ -102,7 +119,17 @@ public class ClientIntegrationService {
         String xmlPayload = payloadBuilderService.buildCreateIssuingContractWithLiabilityPayload(request, correlationId);
         String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
 
-        return XmlParserUtil.parseCreateIssuingContractWithLiabilityResponse(xmlResponse);
+        CreateIssuingContractWithLiabilityResponse response = XmlParserUtil.parseCreateIssuingContractWithLiabilityResponse(xmlResponse);
+        if (!response.isSuccess()) {
+            log.error("Tạo hợp đồng Issuing với Liability thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED, 
+                correlationId, 
+                "Tạo hợp đồng Issuing thất bại: " + response.getRetMsg(),
+                response.getRetMsg()
+            );
+        }
+        return response;
     }
 
     private String sendSoapRequest(String xmlPayload, String correlationId) {
