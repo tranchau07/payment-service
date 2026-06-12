@@ -6,6 +6,8 @@ import com.payment.service.dto.response.ClientListResponse;
 import com.payment.service.dto.response.ClientResponse;
 import com.payment.service.entity.Client;
 import com.payment.service.mapper.ClientMapper;
+import com.payment.service.repository.AcntContractRepository;
+import com.payment.service.repository.ApplProductRepository;
 import com.payment.service.repository.ClientRepository;
 import com.payment.service.repository.specification.ClientSpecification;
 import lombok.AccessLevel;
@@ -25,11 +27,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class ClientService {
 
     ClientRepository clientRepository;
     ClientMapper clientMapper;
+    AcntContractRepository contractRepository;
+    ApplProductRepository productRepository;
 
     @Transactional(readOnly = true)
     public ClientListResponse searchClients(ClientSearchRequest searchRequest, Pageable pageable) {
@@ -79,4 +82,86 @@ public class ClientService {
         return false;
     }
 
+    @Transactional(readOnly = true)
+    public com.payment.service.dto.response.ClientHierarchyResponse getClientHierarchy(Long clientId) {
+        log.info("Xây dựng cây phả hệ cho client ID: {}", clientId);
+        
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new com.payment.service.exception.AppException(
+                        com.payment.service.exception.ErrorCode.CLIENT_NOT_FOUND, 
+                        null, 
+                        "Không tìm thấy khách hàng với ID: " + clientId, 
+                        null
+                ));
+        
+        ClientResponse clientResponse = clientMapper.toResponse(client);
+        
+        java.util.List<com.payment.service.entity.AcntContract> contracts = contractRepository.findByClientIdAndAmndState(clientId, "A");
+        java.util.List<com.payment.service.entity.ApplProduct> products = productRepository.findAll();
+        
+        java.util.Map<Long, com.payment.service.entity.ApplProduct> productMap = products.stream()
+                .collect(java.util.stream.Collectors.toMap(com.payment.service.entity.ApplProduct::getId, java.util.function.Function.identity(), (p1, p2) -> p1));
+        
+        java.util.List<com.payment.service.dto.response.ContractNodeResponse> nodes = contracts.stream()
+                .map(c -> {
+                    String productCode = null;
+                    String productName = null;
+                    String productType = "UNKNOWN";
+                    
+                    String productStr = c.getProduct();
+                    if (productStr != null && productStr.length() > 6) {
+                        try {
+                            long parsedId = Long.parseLong(productStr.substring(6));
+                            com.payment.service.entity.ApplProduct p = productMap.get(parsedId);
+                            if (p != null) {
+                                productCode = p.getCode();
+                                productName = p.getName();
+                            }
+                        } catch (NumberFormatException e) {
+                            log.warn("Invalid product ID format in contract: {}", productStr);
+                        }
+                    }
+                    
+                    if ("LIAB_TRAINING01".equals(productCode)) {
+                        productType = "LIABILITY";
+                    } else if ("ISSUING_TRAINING01".equals(productCode)) {
+                        productType = "ISSUING";
+                    } else if ("C".equalsIgnoreCase(c.getConCat())) {
+                        productType = "CARD";
+                    }
+                    
+                    // Determine parentId based on WAY4 rules
+                    Long parentId = null;
+                    if ("CARD".equals(productType)) {
+                        parentId = c.getAcntContractOid() != null ? c.getAcntContractOid() : c.getBillingContract();
+                    } else if ("ISSUING".equals(productType)) {
+                        parentId = c.getLiabContract();
+                    }
+                    
+                    return com.payment.service.dto.response.ContractNodeResponse.builder()
+                            .id(c.getId())
+                            .contractNumber(c.getContractNumber())
+                            .contractName(c.getContractName())
+                            .contractLevel(c.getContractLevel())
+                            .productCode(productCode)
+                            .productName(productName)
+                            .productType(productType)
+                            .parentId(parentId)
+                            .liabContract(c.getLiabContract())
+                            .acntContractOid(c.getAcntContractOid())
+                            .billingContract(c.getBillingContract())
+                            .curr(c.getCurr())
+                            .amountAvailable(c.getAmountAvailable())
+                            .totalBalance(c.getTotalBalance())
+                            .dateOpen(c.getDateOpen())
+                            .dateExpire(c.getDateExpire())
+                            .build();
+                })
+                .collect(java.util.stream.Collectors.toList());
+        
+        return com.payment.service.dto.response.ClientHierarchyResponse.builder()
+                .client(clientResponse)
+                .contracts(nodes)
+                .build();
+    }
 }

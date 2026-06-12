@@ -8,12 +8,12 @@ import com.payment.service.dto.response.CreateIssuingContractWithLiabilityRespon
 import com.payment.service.util.XmlParserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
@@ -26,10 +26,9 @@ public class ClientIntegrationService {
     private final SoapPayloadBuilderService payloadBuilderService;
     private final RestTemplate restTemplate;
 
-    @org.springframework.beans.factory.annotation.Value("${soap.webservice.url}")
+    @Value("${soap.webservice.url}")
     private String soapEndpoint;
 
-    @Transactional(rollbackFor = Exception.class)
     public CreateClientResponse registerClientToCore(CreateClientRequest request) {
         String correlationId = UUID.randomUUID().toString();
         log.info("Bắt đầu xử lý đăng ký khách hàng. CorrelationID: {}", correlationId);
@@ -65,34 +64,6 @@ public class ClientIntegrationService {
             clientResponse.setAddressUpdateStatus("SKIPPED");
         }
 
-        // 3. Tự động tạo Hợp đồng (Contract) sau khi tạo Client thành công
-        try {
-            log.info("Bắt đầu tạo hợp đồng tự động cho Client ID: {}. CorrelationID: {}", clientResponse.getNewClientId(), correlationId);
-            CreateContractResponse contractResponse = createContractViaSoap(request, clientResponse.getNewClientId(), correlationId);
-            if (contractResponse.isSuccess()) {
-                log.info("Tạo hợp đồng thành công cho Client ID: {}. Số hợp đồng: {}", clientResponse.getNewClientId(), contractResponse.getContractNumber());
-                clientResponse.setContractCreationStatus("SUCCESS: " + contractResponse.getContractNumber());
-            } else {
-                log.error("Tạo hợp đồng thất bại cho Client ID: {}. Lỗi: {}", clientResponse.getNewClientId(), contractResponse.getRetMsg());
-                throw new com.payment.service.exception.AppException(
-                    com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED, 
-                    correlationId, 
-                    "Tạo hợp đồng thất bại: " + contractResponse.getRetMsg(),
-                    contractResponse.getRetMsg()
-                );
-            }
-        } catch (com.payment.service.exception.AppException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Lỗi hệ thống khi tạo hợp đồng cho Client ID: {}. Lỗi: {}", clientResponse.getNewClientId(), e.getMessage());
-            throw new com.payment.service.exception.AppException(
-                com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED, 
-                correlationId, 
-                "Lỗi hệ thống khi tạo hợp đồng: " + e.getMessage(),
-                e.getMessage()
-            );
-        }
-
         return clientResponse;
     }
 
@@ -106,8 +77,8 @@ public class ClientIntegrationService {
         log.info("Cập nhật địa chỉ SOAP hoàn tất cho ID: {}. CorrelationID: {}", clientId, correlationId);
     }
 
-    public CreateContractResponse createContractViaSoap(CreateClientRequest request, Long clientId, String correlationId) {
-        String contractXmlPayload = payloadBuilderService.buildCreateContractPayload(request, clientId, correlationId);
+    public CreateContractResponse createLiabilityContractViaSoap(Long clientId, String branch, String institutionCode, String cbsNumber, String correlationId) {
+        String contractXmlPayload = payloadBuilderService.buildCreateContractPayload(clientId, branch, institutionCode, cbsNumber, correlationId);
         String contractXmlResponse = sendSoapRequest(contractXmlPayload, correlationId);
         return XmlParserUtil.parseCreateContractResponse(contractXmlResponse);
     }

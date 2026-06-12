@@ -10,6 +10,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.payment.service.dto.request.CreateLiabilityContractRequest;
+import com.payment.service.dto.response.LiabilityCheckResponse;
+import com.payment.service.dto.response.CreateContractResponse;
+
 @RestController
 @RequestMapping("/contracts")
 @RequiredArgsConstructor
@@ -27,5 +31,15 @@ public class ContractController {
     @PostMapping("/create-with-liability")
     public CreateIssuingContractWithLiabilityResponse createIssuingContractWithLiability(@RequestBody CreateIssuingContractWithLiabilityRequest request) {
         return contractService.createIssuingContractWithLiability(request);
+    }
+
+    @GetMapping("/liability-by-client/{clientNumber}")
+    public LiabilityCheckResponse checkClientLiability(@PathVariable String clientNumber) {
+        return contractService.checkClientLiability(clientNumber);
+    }
+
+    @PostMapping("/create-liability")
+    public CreateContractResponse createLiabilityContract(@RequestBody CreateLiabilityContractRequest request) {
+        return contractService.createLiabilityContract(request);
     }
 }
