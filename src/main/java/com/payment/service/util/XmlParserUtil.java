@@ -4,6 +4,7 @@ import com.payment.service.dto.response.CreateCardResponse;
 import com.payment.service.dto.response.CreateClientResponse;
 import com.payment.service.dto.response.CreateContractResponse;
 import com.payment.service.dto.response.CreateIssuingContractWithLiabilityResponse;
+import com.payment.service.dto.response.CreateMerchantResponse;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -120,6 +121,33 @@ public class XmlParserUtil {
             return CreateCardResponse.builder()
                     .cardNumber(cardNumber)
                     .applicationNumber(appNumber)
+                    .retCode(retCode.isEmpty() ? null : Long.parseLong(retCode))
+                    .retMsg(retMsg)
+                    .debugInfo(debugInfo)
+                    .resultInfo(resultInfo)
+                    .build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing XML response", e);
+        }
+    }
+
+    public static CreateMerchantResponse parseCreateMerchantResponse(String xml) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(xml)));
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+
+            String newClient = xPath.evaluate("//NewClient", doc);
+            String retCode = xPath.evaluate("//RetCode", doc);
+            String retMsg = xPath.evaluate("//RetMsg", doc);
+            String debugInfo = xPath.evaluate("//DebugInfo", doc);
+            String resultInfo = xPath.evaluate("//ResultInfo", doc);
+
+            return CreateMerchantResponse.builder()
+                    .newMerchantId(newClient.isEmpty() ? null : Long.parseLong(newClient))
                     .retCode(retCode.isEmpty() ? null : Long.parseLong(retCode))
                     .retMsg(retMsg)
                     .debugInfo(debugInfo)

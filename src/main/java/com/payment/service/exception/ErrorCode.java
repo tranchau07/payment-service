@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     INVALID_REQUEST_DATA("VAL_01", "Dữ liệu yêu cầu không hợp lệ", HttpStatus.BAD_REQUEST),
     CLIENT_NOT_FOUND("CLI_04", "Không tìm thấy thông tin khách hàng", HttpStatus.NOT_FOUND),
+    CLIENT_ALREADY_EXISTS("CLI_05", "Mã khách hàng (Client Number) đã tồn tại trong hệ thống", HttpStatus.BAD_REQUEST),
     CORE_CONNECTION_FAILED("INT_50", "Không thể kết nối đến hệ thống Core Way4", HttpStatus.SERVICE_UNAVAILABLE),
     CORE_CLIENT_CREATION_FAILED("INT_01", "Lỗi tạo khách hàng trên Core", HttpStatus.UNPROCESSABLE_ENTITY),
     CORE_CONTRACT_CREATION_FAILED("INT_02", "Lỗi tạo hợp đồng trên Core", HttpStatus.UNPROCESSABLE_ENTITY),

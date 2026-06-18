@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:wsin="http://www.openwaygroup.com/wsint"
+                  xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateMerchant>
+            <wsin:Reason th:text="${request.reason}">Create Merchant</wsin:Reason>
+            <wsin:InObject>
+                <wsin:InstitutionCode th:text="${request.institutionCode}">0001</wsin:InstitutionCode>
+                <wsin:Branch th:text="${request.branchCode}">0101</wsin:Branch>
+                <wsin:ClientCategory th:text="${request.clientCategory}">C</wsin:ClientCategory>
+                <wsin:ClientTypeCode th:text="${request.clientTypeCode}">M_RES</wsin:ClientTypeCode>
+                <wsin:ProductCategory th:text="${request.productCategory}">M</wsin:ProductCategory>
+                <wsin:CompanyName th:text="${request.companyName}">Cong Ty Cong Nghe Thanh Toan ABC</wsin:CompanyName>
+                <wsin:TradeName th:text="${request.tradeName}">ABC Payment Tech</wsin:TradeName>
+                <wsin:ShortName th:text="${request.shortName}">ABC Pay</wsin:ShortName>
+                <wsin:URL th:text="${request.url}">https://abcpay.vn</wsin:URL>
+                <wsin:LanguageCode th:text="${request.languageCode}">RUS</wsin:LanguageCode>
+                <wsin:Phone th:text="${request.phone}">02838383838</wsin:Phone>
+                <wsin:MobilePhone th:text="${request.mobilePhone}">0909123456</wsin:MobilePhone>
+                <wsin:EMail th:text="${request.email}">contact@abcpay.vn</wsin:EMail>
+                <wsin:ClientNumber th:text="${request.clientNumber}">M_ABC_PAY_001</wsin:ClientNumber>
+                <wsin:RegistrationType th:text="${request.registrationType}">BUS</wsin:RegistrationType>
+                <wsin:RegistrationNumber th:text="${request.registrationNumber}">03123456780</wsin:RegistrationNumber>
+                <wsin:RegistrationDetails th:text="${request.registrationDetails}">So KHDT TP.HCM</wsin:RegistrationDetails>
+                <wsin:TIN th:text="${request.tin}">03123456780</wsin:TIN>
+                <wsin:RegistrationDate th:text="${request.registrationDate}">2026-01-01</wsin:RegistrationDate>
+            </wsin:InObject>
+        </wsin:CreateMerchant>
+    </soapenv:Body>
+</soapenv:Envelope>

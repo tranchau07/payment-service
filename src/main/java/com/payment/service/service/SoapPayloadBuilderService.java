@@ -91,4 +91,16 @@ public class SoapPayloadBuilderService {
 
         return xmlTemplateEngine.process("create_card_v3", context);
     }
+
+    public String buildCreateMerchantPayload(com.payment.service.dto.request.CreateMerchantRequest request, String correlationId) {
+        Context context = new Context();
+        context.setVariable("request", request);
+        context.setVariable("sessionContextStr", "");
+        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
+        context.setVariable("correlationId", correlationId);
+
+        log.info("Building SOAP payload for Merchant Registration. CorrelationID: {}", correlationId);
+
+        return xmlTemplateEngine.process("create_merchant", context);
+    }
 }

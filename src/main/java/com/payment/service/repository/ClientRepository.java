@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long>, JpaSpecificationExecutor<Client> {
     List<Client> findByClientNumberAndAmndState(String clientNumber, String amndState);
+    List<Client> findByItnAndAmndState(String itn, String amndState);
+    List<Client> findByRegNumberAndAmndState(String regNumber, String amndState);
 }

@@ -15,4 +15,7 @@ public interface AcntContractRepository extends JpaRepository<AcntContract, Long
     List<AcntContract> findByClientIdAndContractLevelAndAmndState(Long clientId, String contractLevel, String amndState);
     List<AcntContract> findByClientId(Long clientId);
     List<AcntContract> findByClientIdAndAmndState(Long clientId, String amndState);
+
+    @org.springframework.data.jpa.repository.Query("SELECT c.product, COUNT(c) FROM AcntContract c WHERE c.amndState = :amndState GROUP BY c.product")
+    List<Object[]> countContractsGroupedByProduct(@org.springframework.data.repository.query.Param("amndState") String amndState);
 }

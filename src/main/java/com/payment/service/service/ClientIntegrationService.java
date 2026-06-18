@@ -2,9 +2,13 @@ package com.payment.service.service;
 
 import com.payment.service.dto.request.CreateClientRequest;
 import com.payment.service.dto.request.CreateIssuingContractWithLiabilityRequest;
+import com.payment.service.dto.request.CreateMerchantRequest;
 import com.payment.service.dto.response.CreateClientResponse;
 import com.payment.service.dto.response.CreateContractResponse;
 import com.payment.service.dto.response.CreateIssuingContractWithLiabilityResponse;
+import com.payment.service.dto.response.CreateMerchantResponse;
+import com.payment.service.entity.Client;
+import com.payment.service.repository.ClientRepository;
 import com.payment.service.util.XmlParserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,6 +30,7 @@ public class ClientIntegrationService {
 
     private final SoapPayloadBuilderService payloadBuilderService;
     private final RestTemplate restTemplate;
+    private final ClientRepository clientRepository;
 
     @Value("${soap.webservice.url}")
     private String soapEndpoint;
@@ -123,5 +129,70 @@ public class ClientIntegrationService {
             log.error("Lỗi khi kết nối SOAP cho CorrelationID: {}. Lỗi: {}", correlationId, e.getMessage());
             throw new RuntimeException("Lỗi tích hợp hệ thống Core: " + e.getMessage(), e);
         }
+    }
+
+    public CreateMerchantResponse registerMerchantToCore(CreateMerchantRequest request) {
+        // 1. Kiểm tra trùng lặp clientNumber trong DB
+        List<Client> existingClients = clientRepository.findByClientNumberAndAmndState(request.getClientNumber(), "A");
+        if (existingClients != null && !existingClients.isEmpty()) {
+            log.warn("Mã khách hàng (Client Number) {} đã tồn tại trên hệ thống.", request.getClientNumber());
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CLIENT_ALREADY_EXISTS,
+                null,
+                "Mã khách hàng (Client Number) đã tồn tại trong hệ thống: " + request.getClientNumber(),
+                "Client Number already exists"
+            );
+        }
+
+        // 2. Kiểm tra trùng lặp TIN (itn) trong DB
+        if (request.getTin() != null && !request.getTin().trim().isEmpty()) {
+            List<Client> existingTin = clientRepository.findByItnAndAmndState(request.getTin().trim(), "A");
+            if (existingTin != null && !existingTin.isEmpty()) {
+                log.warn("Mã số thuế (TIN) {} đã tồn tại trên hệ thống.", request.getTin());
+                throw new com.payment.service.exception.AppException(
+                    com.payment.service.exception.ErrorCode.CLIENT_ALREADY_EXISTS,
+                    null,
+                    "Mã số thuế (TIN) đã tồn tại trong hệ thống: " + request.getTin(),
+                    "TIN already exists"
+                );
+            }
+        }
+
+        // 3. Kiểm tra trùng lặp registrationNumber (regNumber) trong DB
+        if (request.getRegistrationNumber() != null && !request.getRegistrationNumber().trim().isEmpty()) {
+            List<Client> existingRegNum = clientRepository.findByRegNumberAndAmndState(request.getRegistrationNumber().trim(), "A");
+            if (existingRegNum != null && !existingRegNum.isEmpty()) {
+                log.warn("Số đăng ký kinh doanh/giấy tờ (Registration Number) {} đã tồn tại trên hệ thống.", request.getRegistrationNumber());
+                throw new com.payment.service.exception.AppException(
+                    com.payment.service.exception.ErrorCode.CLIENT_ALREADY_EXISTS,
+                    null,
+                    "Số đăng ký kinh doanh/giấy tờ đã tồn tại trong hệ thống: " + request.getRegistrationNumber(),
+                    "Registration Number already exists"
+                );
+            }
+        }
+
+        String correlationId = UUID.randomUUID().toString();
+        log.info("Bắt đầu xử lý đăng ký Merchant. CorrelationID: {}", correlationId);
+
+        // 2. Gửi request tạo Merchant
+        String merchantXmlPayload = payloadBuilderService.buildCreateMerchantPayload(request, correlationId);
+        String merchantXmlResponse = sendSoapRequest(merchantXmlPayload, correlationId);
+
+        CreateMerchantResponse merchantResponse = XmlParserUtil.parseCreateMerchantResponse(merchantXmlResponse);
+
+        if (!merchantResponse.isSuccess()) {
+            log.error("Tạo Merchant thất bại: {}. CorrelationID: {}", merchantResponse.getRetMsg(), correlationId);
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CLIENT_CREATION_FAILED, 
+                correlationId, 
+                "Tạo Merchant thất bại: " + merchantResponse.getRetMsg(),
+                merchantResponse.getRetMsg()
+            );
+        }
+
+        log.info("Tạo Merchant thành công. NewMerchantID: {}. CorrelationID: {}", merchantResponse.getNewMerchantId(), correlationId);
+
+        return merchantResponse;
     }
 }

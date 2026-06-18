@@ -7,22 +7,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 class PaymentServiceApplicationTests {
 
 	@org.springframework.beans.factory.annotation.Autowired
-	com.payment.service.repository.AcntContractRepository contractRepository;
+	com.payment.service.repository.ClientRepository clientRepository;
 
 	@Test
 	void contextLoads() {
-		System.out.println("=== CONTRACT HIERARCHY DETAILS ===");
-		contractRepository.findAll().forEach(c -> {
-			if (c.getClientId() != null && c.getClientId() == 94530L) {
-				System.out.println("Contract ID: " + c.getId() + 
-					" | Number: " + c.getContractNumber() + 
-					" | ParentContractID (acntContractId): " + c.getAcntContractId() + 
-					" | Oid (acntContractOid): " + c.getAcntContractOid() + 
-					" | LiabContract: " + c.getLiabContract() + 
-					" | BillingContract: " + c.getBillingContract() + 
-					" | Level: " + c.getContractLevel() + 
-					" | Product: " + c.getProduct() + 
-					" | Name: " + c.getContractName());
+		System.out.println("=== CLIENTS WITH 'Chau' OR 'Tran' IN NAME ===");
+		clientRepository.findAll().forEach(c -> {
+			String sn = c.getShortName() != null ? c.getShortName().toLowerCase() : "";
+			String fn = c.getFirstName() != null ? c.getFirstName().toLowerCase() : "";
+			String ln = c.getLastName() != null ? c.getLastName().toLowerCase() : "";
+			if (sn.contains("chau") || sn.contains("tran") || 
+				fn.contains("chau") || fn.contains("tran") || 
+				ln.contains("chau") || ln.contains("tran")) {
+				System.out.println("ID: " + c.getId() + 
+					" | ShortName: '" + c.getShortName() + "'" +
+					" | FirstName: '" + c.getFirstName() + "'" +
+					" | LastName: '" + c.getLastName() + "'" +
+					" | ClientNumber: '" + c.getClientNumber() + "'" +
+					" | AmndState: '" + c.getAmndState() + "'");
 			}
 		});
 	}

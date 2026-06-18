@@ -36,11 +36,14 @@ public class ClientSpecification {
             }
 
             if (StringUtils.hasText(request.getClientNumber())) {
-                predicates.add(cb.like(root.get("clientNumber"), "%" + request.getClientNumber() + "%"));
+                predicates.add(cb.equal(
+                        cb.lower(root.get("clientNumber")),
+                        request.getClientNumber().trim().toLowerCase()
+                ));
             }
 
             if (StringUtils.hasText(request.getItn())) {
-                predicates.add(cb.like(root.get("itn"), "%" + request.getItn() + "%"));
+                predicates.add(cb.equal(root.get("itn"), request.getItn().trim()));
             }
 
             if (StringUtils.hasText(request.getPhoneNumber())) {
