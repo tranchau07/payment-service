@@ -195,4 +195,42 @@ public class ClientIntegrationService {
 
         return merchantResponse;
     }
+
+    public com.payment.service.dto.response.CreateAcquiringContractResponse createAcquiringContractV2(com.payment.service.dto.request.CreateAcquiringContractRequest request) {
+        String correlationId = UUID.randomUUID().toString();
+        log.info("Bắt đầu tạo hợp đồng Acquiring qua SOAP. CorrelationID: {}", correlationId);
+
+        String xmlPayload = payloadBuilderService.buildCreateAcquiringContractV2Payload(request, correlationId);
+        String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
+
+        com.payment.service.dto.response.CreateAcquiringContractResponse response = XmlParserUtil.parseCreateAcquiringContractV2Response(xmlResponse);
+        if (!response.isSuccess()) {
+            log.error("Tạo hợp đồng Acquiring qua SOAP thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED,
+                correlationId,
+                "Tạo hợp đồng Acquiring thất bại: " + response.getRetMsg(),
+                response.getRetMsg()
+            );
+        }
+        return response;
+    }
+
+    public com.payment.service.dto.response.CreateAcquiringContractAddressResponse createAcquiringContractAddress(String contractNumber, com.payment.service.dto.request.CreateAcquiringContractRequest.AddressObject address, String correlationId) {
+        log.info("Bắt đầu tạo địa chỉ hợp đồng Acquiring qua SOAP. CorrelationID: {}", correlationId);
+        String xmlPayload = payloadBuilderService.buildCreateAcquiringContractAddressPayload(contractNumber, address, correlationId);
+        String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
+
+        com.payment.service.dto.response.CreateAcquiringContractAddressResponse response = XmlParserUtil.parseCreateAcquiringContractAddressResponse(xmlResponse);
+        if (!response.isSuccess()) {
+            log.error("Tạo địa chỉ hợp đồng Acquiring thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED,
+                correlationId,
+                "Tạo địa chỉ hợp đồng Acquiring thất bại: " + response.getRetMsg(),
+                response.getRetMsg()
+            );
+        }
+        return response;
+    }
 }

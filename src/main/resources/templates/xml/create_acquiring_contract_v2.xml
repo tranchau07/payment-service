@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+        xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:wsin="http://www.openwaygroup.com/wsint"
+        xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateAcquiringContractV2>
+            <wsin:ClientSearchMethod th:text="${request.clientSearchMethod}">CLIENT_ID</wsin:ClientSearchMethod>
+            <wsin:ClientIdentifier th:text="${request.clientIdentifier}">96560</wsin:ClientIdentifier>
+            <wsin:ProductCode th:text="${request.productCode}">RETAIL_ACC</wsin:ProductCode>
+            <wsin:ProductCode2 th:if="${request.productCode2 != null}" th:text="${request.productCode2}"></wsin:ProductCode2>
+            <wsin:ProductCode3 th:if="${request.productCode3 != null}" th:text="${request.productCode3}"></wsin:ProductCode3>
+            
+            <wsin:InObject>
+                <wsin:InstitutionCode th:text="${request.inObject.institutionCode}">0001</wsin:InstitutionCode>
+                <wsin:Branch th:text="${request.inObject.branch}">0101</wsin:Branch>
+                <wsin:ContractNumber th:if="${request.inObject.contractNumber != null}" th:text="${request.inObject.contractNumber}">ACQ-CTR-01</wsin:ContractNumber>
+                <wsin:ContractName th:text="${request.inObject.contractName}">Acquiring Contract - ABC Pay</wsin:ContractName>
+                <wsin:Currency th:text="${request.inObject.currency}">810</wsin:Currency>
+                <wsin:MCC th:text="${request.inObject.mcc}">3390</wsin:MCC>
+                <wsin:MerchantID th:text="${request.inObject.merchantId}">MID987654321</wsin:MerchantID>
+                <wsin:CBSNumber th:text="${request.inObject.cbsNumber}">21324556600</wsin:CBSNumber>
+                <wsin:OpenDate th:text="${request.inObject.openDate}">2026-01-01</wsin:OpenDate>
+            </wsin:InObject>
+        </wsin:CreateAcquiringContractV2>
+    </soapenv:Body>
+</soapenv:Envelope>

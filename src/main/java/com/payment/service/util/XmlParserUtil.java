@@ -158,4 +158,66 @@ public class XmlParserUtil {
             throw new RuntimeException("Error parsing XML response", e);
         }
     }
+
+    public static com.payment.service.dto.response.CreateAcquiringContractResponse parseCreateAcquiringContractV2Response(String xml) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(xml)));
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+
+            String createdContract = xPath.evaluate("//CreatedContract", doc);
+            String contractNumber = xPath.evaluate("//ContractNumber", doc);
+            String appNumber = xPath.evaluate("//ApplicationNumber", doc);
+            String cbsNumber = xPath.evaluate("//CBSNumber", doc);
+            String cbsId = xPath.evaluate("//CBSID", doc);
+            String retCode = xPath.evaluate("//RetCode", doc);
+            String retMsg = xPath.evaluate("//RetMsg", doc);
+            String debugInfo = xPath.evaluate("//DebugInfo", doc);
+            String resultInfo = xPath.evaluate("//ResultInfo", doc);
+
+            return com.payment.service.dto.response.CreateAcquiringContractResponse.builder()
+                    .createdContract(createdContract.isEmpty() ? null : Long.parseLong(createdContract))
+                    .contractNumber(contractNumber)
+                    .applicationNumber(appNumber)
+                    .cbsNumber(cbsNumber)
+                    .cbsId(cbsId)
+                    .retCode(retCode.isEmpty() ? null : Long.parseLong(retCode))
+                    .retMsg(retMsg)
+                    .debugInfo(debugInfo)
+                    .resultInfo(resultInfo)
+                    .build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing XML response", e);
+        }
+    }
+
+    public static com.payment.service.dto.response.CreateAcquiringContractAddressResponse parseCreateAcquiringContractAddressResponse(String xml) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(xml)));
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+
+            String createdAddress = xPath.evaluate("//CreatedAddress", doc);
+            String retCode = xPath.evaluate("//RetCode", doc);
+            String retMsg = xPath.evaluate("//RetMsg", doc);
+            String debugInfo = xPath.evaluate("//DebugInfo", doc);
+            String resultInfo = xPath.evaluate("//ResultInfo", doc);
+
+            return com.payment.service.dto.response.CreateAcquiringContractAddressResponse.builder()
+                    .createdAddress(createdAddress.isEmpty() ? null : Long.parseLong(createdAddress))
+                    .retCode(retCode.isEmpty() ? null : Long.parseLong(retCode))
+                    .retMsg(retMsg)
+                    .debugInfo(debugInfo)
+                    .resultInfo(resultInfo)
+                    .build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing XML response", e);
+        }
+    }
 }

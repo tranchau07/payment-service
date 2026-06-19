@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+        xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:wsin="http://www.openwaygroup.com/wsint"
+        xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateAcquiringContractAddress>
+            <wsin:ContractSearchMethod>CONTRACT_NUMBER</wsin:ContractSearchMethod>
+            <wsin:ContractIdentifier th:text="${contractNumber}">ACQ-CTR-01</wsin:ContractIdentifier>
+            <wsin:Reason th:text="${reason != null ? reason : 'Create Acquiring Contract Address'}">Create Acquiring Contract Address</wsin:Reason>
+            <wsin:InObject>
+                <wsin:AddressTypeCode th:text="${address.addressTypeCode}">STMT</wsin:AddressTypeCode>
+                <wsin:Branch th:text="${address.branch}">0101</wsin:Branch>
+                <wsin:Country th:text="${address.country}">RUS</wsin:Country>
+                <wsin:Region th:if="${address.region != null}" th:text="${address.region}">96</wsin:Region>
+                <wsin:District th:if="${address.district != null}" th:text="${address.district}">96500</wsin:District>
+                <wsin:City th:if="${address.city != null}" th:text="${address.city}">96500</wsin:City>
+                <wsin:ZipCode th:if="${address.zipCode != null}" th:text="${address.zipCode}">96500</wsin:ZipCode>
+                <wsin:Line1 th:if="${address.line1 != null}" th:text="${address.line1}">96500</wsin:Line1>
+                <wsin:Line2 th:if="${address.line2 != null}" th:text="${address.line2}">96500</wsin:Line2>
+                <wsin:Line3 th:if="${address.line3 != null}" th:text="${address.line3}">96500</wsin:Line3>
+                <wsin:Line4 th:if="${address.line4 != null}" th:text="${address.line4}">96500</wsin:Line4>
+            </wsin:InObject>
+        </wsin:CreateAcquiringContractAddress>
+    </soapenv:Body>
+</soapenv:Envelope>

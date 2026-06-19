@@ -697,6 +697,40 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create Acquiring Contract",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientSearchMethod\": \"CLIENT_ID\",\n    \"clientIdentifier\": \"96560\",\n    \"productCode\": \"RETAIL_ACC\",\n    \"inObject\": {\n        \"institutionCode\": \"0001\",\n        \"branch\": \"0101\",\n        \"contractNumber\": \"ACQ-CTR-01\",\n        \"contractName\": \"Acquiring Contract - ABC Pay\",\n        \"currency\": \"810\",\n        \"mcc\": \"3390\",\n        \"merchantId\": \"MID987654321\",\n        \"cbsNumber\": \"21324556600\",\n        \"openDate\": \"2026-01-01\"\n    },\n    \"address\": {\n        \"addressTypeCode\": \"STMT\",\n        \"branch\": \"0101\",\n        \"country\": \"RUS\",\n        \"region\": \"96\",\n        \"district\": \"96500\",\n        \"city\": \"96500\",\n        \"zipCode\": \"96500\",\n        \"line1\": \"96500\",\n        \"line2\": \"96500\",\n        \"line3\": \"96500\",\n        \"line4\": \"96500\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/contracts/acquiring",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"contracts",
+								"acquiring"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1248,6 +1282,45 @@
 								"api",
 								"products",
 								"tree"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Sics (MCC)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/sics?code=&name=&useInBank=Y",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sics"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": ""
+								},
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "useInBank",
+									"value": "Y"
+								}
 							]
 						}
 					},

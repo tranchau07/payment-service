@@ -42,4 +42,9 @@ public class ContractController {
     public CreateContractResponse createLiabilityContract(@RequestBody CreateLiabilityContractRequest request) {
         return contractService.createLiabilityContract(request);
     }
+
+    @PostMapping("/acquiring")
+    public com.payment.service.dto.response.CreateAcquiringContractResponse createAcquiringContractV2(@RequestBody com.payment.service.dto.request.CreateAcquiringContractRequest request) {
+        return contractService.createAcquiringContractV2(request);
+    }
 }

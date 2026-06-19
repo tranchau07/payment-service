@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface AcntContractRepository extends JpaRepository<AcntContract, Long> {
     Optional<AcntContract> findByContractNumber(String contractNumber);
     Optional<AcntContract> findByContractNumberAndAmndState(String contractNumber, String amndState);
+    Optional<AcntContract> findByMerchantIdAndAmndState(String merchantId, String amndState);
+    Optional<AcntContract> findByRbsNumberAndAmndState(String rbsNumber, String amndState);
     List<AcntContract> findByClientIdAndContractLevel(Long clientId, String contractLevel);
     List<AcntContract> findByClientIdAndContractLevelAndAmndState(Long clientId, String contractLevel, String amndState);
     List<AcntContract> findByClientId(Long clientId);

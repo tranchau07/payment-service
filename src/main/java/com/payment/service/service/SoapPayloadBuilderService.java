@@ -103,4 +103,30 @@ public class SoapPayloadBuilderService {
 
         return xmlTemplateEngine.process("create_merchant", context);
     }
+
+    public String buildCreateAcquiringContractV2Payload(com.payment.service.dto.request.CreateAcquiringContractRequest request, String correlationId) {
+        Context context = new Context();
+        context.setVariable("request", request);
+        context.setVariable("sessionContextStr", "");
+        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
+        context.setVariable("correlationId", correlationId);
+
+        log.info("Building SOAP payload for CreateAcquiringContractV2. CorrelationID: {}", correlationId);
+
+        return xmlTemplateEngine.process("create_acquiring_contract_v2", context);
+    }
+
+    public String buildCreateAcquiringContractAddressPayload(String contractNumber, com.payment.service.dto.request.CreateAcquiringContractRequest.AddressObject address, String correlationId) {
+        Context context = new Context();
+        context.setVariable("contractNumber", contractNumber);
+        context.setVariable("address", address);
+        context.setVariable("reason", "Create Acquiring Contract Address");
+        context.setVariable("sessionContextStr", "");
+        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
+        context.setVariable("correlationId", correlationId);
+
+        log.info("Building SOAP payload for CreateAcquiringContractAddress. CorrelationID: {}", correlationId);
+
+        return xmlTemplateEngine.process("create_acquiring_contract_address", context);
+    }
 }
