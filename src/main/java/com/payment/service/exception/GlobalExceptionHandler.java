@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MissingRequestHeaderException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -52,6 +53,16 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestHeader(MissingRequestHeaderException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .errorCode(ErrorCode.INVALID_REQUEST_DATA.getCode())
+                .message("Thiáº¿u HTTP header báº¯t buá»™c: " + ex.getHeaderName())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(BusinessException.class)

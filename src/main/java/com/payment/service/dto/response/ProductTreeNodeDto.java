@@ -17,13 +17,18 @@ public class ProductTreeNodeDto {
     String pcat;
     String conCat;
     Long contrType;
+    String contrTypeDesc;
     Long contrSubtype;
+    String contrSubtypeDesc;
     Long accScheme;
+    String accSchemeDesc;
     Long servicePack;
+    String servicePackDesc;
     BigDecimal maxCreditLimit;
     BigDecimal minCreditLimit;
     BigDecimal defaultCreditLimit;
     Integer ncontracts;
     String isActive;
+    String isReady;
     List<ProductTreeNodeDto> children;
 }

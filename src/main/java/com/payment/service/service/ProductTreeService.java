@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,12 +24,13 @@ public class ProductTreeService {
 
     ApplProductRepository applProductRepository;
     AcntContractRepository acntContractRepository;
+    JdbcTemplate jdbcTemplate;
 
     public List<ProductTreeNodeDto> getProductTree() {
         log.info("Fetching all active products to construct hierarchy tree.");
         
         // Fetch all active products
-        List<ApplProduct> activeProducts = applProductRepository.findAllByIsReadyAndAmndState("Y", "A");
+        List<ApplProduct> activeProducts = applProductRepository.findAllByAmndState("A");
 
         // Fetch real-time active contracts counts grouped by product internal code
         log.info("Querying active contracts count from ACNT_CONTRACT table.");
@@ -40,6 +42,72 @@ public class ProductTreeService {
             if (productCode != null) {
                 productContractCounts.put(productCode, count);
             }
+        }
+
+        // Load lookups for descriptions
+        log.info("Loading catalog lookups for product configuration parameters.");
+        Map<Long, String> contrTypeMap = new HashMap<>();
+        try {
+            List<Map<String, Object>> contrTypes = jdbcTemplate.queryForList(
+                "SELECT ID, CODE, NAME FROM INT.CONTR_TYPE WHERE AMND_STATE = 'A'"
+            );
+            for (Map<String, Object> r : contrTypes) {
+                Long id = ((Number) r.get("ID")).longValue();
+                String code = (String) r.get("CODE");
+                String name = (String) r.get("NAME");
+                String desc = (code != null && !code.trim().isEmpty() ? code + " - " : "") + name;
+                contrTypeMap.put(id, desc);
+            }
+        } catch (Exception e) {
+            log.error("Failed to load CONTR_TYPE lookup map", e);
+        }
+
+        Map<Long, String> contrSubtypeMap = new HashMap<>();
+        try {
+            List<Map<String, Object>> contrSubtypes = jdbcTemplate.queryForList(
+                "SELECT ID, CODE, NAME FROM INT.CONTR_SUBTYPE WHERE AMND_STATE = 'A'"
+            );
+            for (Map<String, Object> r : contrSubtypes) {
+                Long id = ((Number) r.get("ID")).longValue();
+                String code = (String) r.get("CODE");
+                String name = (String) r.get("NAME");
+                String desc = (code != null && !code.trim().isEmpty() ? code + " - " : "") + name;
+                contrSubtypeMap.put(id, desc);
+            }
+        } catch (Exception e) {
+            log.error("Failed to load CONTR_SUBTYPE lookup map", e);
+        }
+
+        Map<Long, String> accSchemeMap = new HashMap<>();
+        try {
+            List<Map<String, Object>> accSchemes = jdbcTemplate.queryForList(
+                "SELECT ID, CODE, SCHEME_NAME FROM INT.ACC_SCHEME WHERE AMND_STATE = 'A'"
+            );
+            for (Map<String, Object> r : accSchemes) {
+                Long id = ((Number) r.get("ID")).longValue();
+                String code = (String) r.get("CODE");
+                String name = (String) r.get("SCHEME_NAME");
+                String desc = (code != null && !code.trim().isEmpty() ? code + " - " : "") + name;
+                accSchemeMap.put(id, desc);
+            }
+        } catch (Exception e) {
+            log.error("Failed to load ACC_SCHEME lookup map", e);
+        }
+
+        Map<Long, String> servPackMap = new HashMap<>();
+        try {
+            List<Map<String, Object>> servPacks = jdbcTemplate.queryForList(
+                "SELECT ID, CODE, NAME FROM INT.SERV_PACK WHERE AMND_STATE = 'A'"
+            );
+            for (Map<String, Object> r : servPacks) {
+                Long id = ((Number) r.get("ID")).longValue();
+                String code = (String) r.get("CODE");
+                String name = (String) r.get("NAME");
+                String desc = (code != null && !code.trim().isEmpty() ? code + " - " : "") + name;
+                servPackMap.put(id, desc);
+            }
+        } catch (Exception e) {
+            log.error("Failed to load SERV_PACK lookup map", e);
         }
         
         // Map to hold ProductTreeNodeDto mapped by internalCode
@@ -58,14 +126,19 @@ public class ProductTreeService {
                     .pcat(product.getPcat())
                     .conCat(product.getConCat())
                     .contrType(product.getContrType())
+                    .contrTypeDesc(product.getContrType() != null ? contrTypeMap.get(product.getContrType()) : null)
                     .contrSubtype(product.getContrSubtype())
+                    .contrSubtypeDesc(product.getContrSubtype() != null ? contrSubtypeMap.get(product.getContrSubtype()) : null)
                     .accScheme(product.getAccScheme())
+                    .accSchemeDesc(product.getAccScheme() != null ? accSchemeMap.get(product.getAccScheme()) : null)
                     .servicePack(product.getServicePack())
+                    .servicePackDesc(product.getServicePack() != null ? servPackMap.get(product.getServicePack()) : null)
                     .maxCreditLimit(product.getMaxCreditLimit())
                     .minCreditLimit(product.getMinCreditLimit())
                     .defaultCreditLimit(product.getDefaultCreditLimit())
                     .ncontracts(count.intValue())
                     .isActive(product.getIsActive())
+                    .isReady(product.getIsReady())
                     .children(new ArrayList<>())
                     .build();
             

@@ -44,7 +44,24 @@ public class ContractController {
     }
 
     @PostMapping("/acquiring")
-    public com.payment.service.dto.response.CreateAcquiringContractResponse createAcquiringContractV2(@RequestBody com.payment.service.dto.request.CreateAcquiringContractRequest request) {
+    public com.payment.service.dto.response.CreateAcquiringContractResponse createAcquiringContractV2(
+            @jakarta.validation.Valid @RequestBody com.payment.service.dto.request.CreateAcquiringContractRequest request) {
         return contractService.createAcquiringContractV2(request);
+    }
+
+    @PostMapping("/acquiring/{contractNumber}/addresses")
+    public com.payment.service.dto.response.CreateAcquiringContractAddressResponse createAcquiringContractAddress(
+            @PathVariable String contractNumber,
+            @jakarta.validation.Valid @RequestBody com.payment.service.dto.request.CreateAcquiringContractAddressRequest request) {
+        return contractService.createAcquiringContractAddress(contractNumber, request);
+    }
+
+    @PostMapping("/acquiring/{contractNumber}/devices")
+    public com.payment.service.dto.response.CreateDeviceResponse createDevice(
+            @PathVariable String contractNumber,
+            @jakarta.validation.Valid @RequestBody com.payment.service.dto.request.CreateDeviceRequest request) {
+        request.setContractSearchMethod("CONTRACT_NUMBER");
+        request.setContractIdentifier(contractNumber);
+        return contractService.createDevice(request);
     }
 }

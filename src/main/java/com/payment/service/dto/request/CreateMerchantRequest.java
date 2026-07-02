@@ -2,6 +2,10 @@ package com.payment.service.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Data
 @Builder
@@ -9,24 +13,24 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateMerchantRequest {
-    String reason;
-    String institutionCode;
-    String branchCode;
-    String clientCategory;
-    String clientTypeCode;
-    String productCategory;
-    String companyName;
+    @NotBlank @Size(max = 255) String reason;
+    @NotBlank @Size(max = 4) String institutionCode;
+    @NotBlank @Size(max = 32) String branchCode;
+    @NotBlank @Pattern(regexp = "C") String clientCategory;
+    @NotBlank @Size(max = 32) String clientTypeCode;
+    @NotBlank @Pattern(regexp = "M") String productCategory;
+    @NotBlank @Size(max = 255) String companyName;
     String tradeName;
-    String shortName;
+    @NotBlank @Size(max = 32) String shortName;
     String url;
-    String languageCode;
+    @NotBlank @Size(max = 3) String languageCode;
     String phone;
     String mobilePhone;
-    String email;
-    String clientNumber;
-    String registrationType;
-    String registrationNumber;
+    @Email @Size(max = 255) String email;
+    @NotBlank @Size(max = 32) String clientNumber;
+    @NotBlank @Size(max = 32) String registrationType;
+    @NotBlank @Size(max = 255) String registrationNumber;
     String registrationDetails;
-    String tin;
-    String registrationDate;
+    @NotBlank @Size(max = 32) String tin;
+    @NotBlank @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}") String registrationDate;
 }

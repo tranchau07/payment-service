@@ -48,6 +48,7 @@ public class ClientService {
     @Transactional(readOnly = true)
     public ClientResponse getClientById(Long id) {
         log.info("Fetching client with ID: {}", id);
+
         return clientRepository.findById(id)
                 .map(clientMapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("Client not found with ID: " + id));
@@ -59,60 +60,74 @@ public class ClientService {
 
         Optional<Client> clientOpt = clientRepository.findById(clientId);
         log.info(clientOpt.toString());
+
         if (clientOpt.isEmpty()) {
             log.warn("Client not found with ID: {}. Skipping address update.", clientId);
             return false;
         }
 
-        Client client = clientOpt.get();
-        if (addressInfo != null) {
-            client.setCountry(addressInfo.getCountry());
-            client.setAddressZip(addressInfo.getAddressZip());
-            client.setState(addressInfo.getState());
-            client.setCity(addressInfo.getCity());
-            client.setAddressLine1(addressInfo.getAddressLine1());
-            client.setAddressLine2(addressInfo.getAddressLine2());
-            client.setAddressLine3(addressInfo.getAddressLine3());
-            client.setAddressLine4(addressInfo.getAddressLine4());
-
-            clientRepository.save(client);
-            log.info("Address updated successfully for client ID: {}", clientId);
-            return true;
+        if (addressInfo == null) {
+            log.warn("Address info is null. Skipping address update for client ID: {}", clientId);
+            return false;
         }
-        return false;
+
+        Client client = clientOpt.get();
+
+        client.setCountry(addressInfo.getCountry());
+        client.setAddressZip(addressInfo.getAddressZip());
+        client.setState(addressInfo.getState());
+        client.setCity(addressInfo.getCity());
+        client.setAddressLine1(addressInfo.getAddressLine1());
+        client.setAddressLine2(addressInfo.getAddressLine2());
+        client.setAddressLine3(addressInfo.getAddressLine3());
+        client.setAddressLine4(addressInfo.getAddressLine4());
+
+        clientRepository.save(client);
+
+        log.info("Address updated successfully for client ID: {}", clientId);
+        return true;
     }
 
     @Transactional(readOnly = true)
     public com.payment.service.dto.response.ClientHierarchyResponse getClientHierarchy(Long clientId) {
         log.info("Xây dựng cây phả hệ cho client ID: {}", clientId);
-        
+
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new com.payment.service.exception.AppException(
-                        com.payment.service.exception.ErrorCode.CLIENT_NOT_FOUND, 
-                        null, 
-                        "Không tìm thấy khách hàng với ID: " + clientId, 
+                        com.payment.service.exception.ErrorCode.CLIENT_NOT_FOUND,
+                        null,
+                        "Không tìm thấy khách hàng với ID: " + clientId,
                         null
                 ));
-        
+
         ClientResponse clientResponse = clientMapper.toResponse(client);
-        
-        java.util.List<com.payment.service.entity.AcntContract> contracts = contractRepository.findByClientIdAndAmndState(clientId, "A");
-        java.util.List<com.payment.service.entity.ApplProduct> products = productRepository.findAll();
-        
+
+        java.util.List<com.payment.service.entity.AcntContract> contracts =
+                contractRepository.findByClientIdAndAmndState(clientId, "A");
+
+        java.util.List<com.payment.service.entity.ApplProduct> products =
+                productRepository.findAll();
+
         java.util.Map<Long, com.payment.service.entity.ApplProduct> productMap = products.stream()
-                .collect(java.util.stream.Collectors.toMap(com.payment.service.entity.ApplProduct::getId, java.util.function.Function.identity(), (p1, p2) -> p1));
-        
+                .collect(java.util.stream.Collectors.toMap(
+                        com.payment.service.entity.ApplProduct::getId,
+                        java.util.function.Function.identity(),
+                        (p1, p2) -> p1
+                ));
+
         java.util.List<com.payment.service.dto.response.ContractNodeResponse> nodes = contracts.stream()
                 .map(c -> {
                     String productCode = null;
                     String productName = null;
                     String productType = "UNKNOWN";
-                    
+
                     String productStr = c.getProduct();
+
                     if (productStr != null && productStr.length() > 6) {
                         try {
                             long parsedId = Long.parseLong(productStr.substring(6));
                             com.payment.service.entity.ApplProduct p = productMap.get(parsedId);
+
                             if (p != null) {
                                 productCode = p.getCode();
                                 productName = p.getName();
@@ -121,23 +136,54 @@ public class ClientService {
                             log.warn("Invalid product ID format in contract: {}", productStr);
                         }
                     }
-                    
+
                     if ("LIAB_TRAINING01".equals(productCode)) {
                         productType = "LIABILITY";
                     } else if ("ISSUING_TRAINING01".equals(productCode)) {
                         productType = "ISSUING";
                     } else if ("C".equalsIgnoreCase(c.getConCat())) {
                         productType = "CARD";
+                    } else if ("A".equalsIgnoreCase(c.getConCat()) && "M".equalsIgnoreCase(c.getPcat())) {
+                        productType = "ACQUIRING";
+                    } else if ("M".equalsIgnoreCase(c.getConCat()) && "M".equalsIgnoreCase(c.getPcat())) {
+                        productType = "DEVICE";
+                    } else if ("M".equalsIgnoreCase(c.getConCat())) {
+                        productType = "ACQUIRING";
+                    } else if ("T".equalsIgnoreCase(c.getConCat())) {
+                        productType = "DEVICE";
                     }
-                    
-                    // Determine parentId based on WAY4 rules
+
                     Long parentId = null;
+
                     if ("CARD".equals(productType)) {
-                        parentId = c.getAcntContractOid() != null ? c.getAcntContractOid() : c.getBillingContract();
+                        parentId = c.getAcntContractOid() != null
+                                ? c.getAcntContractOid()
+                                : c.getBillingContract();
                     } else if ("ISSUING".equals(productType)) {
                         parentId = c.getLiabContract();
+                    } else if ("DEVICE".equals(productType)) {
+                        parentId = c.getAcntContractOid() != null
+                                ? c.getAcntContractOid()
+                                : c.getBillingContract();
                     }
-                    
+
+                    String addressLine1 = null;
+                    String city = null;
+                    String country = null;
+
+                    if ("ACQUIRING".equals(productType)) {
+                        Optional<AcntContractRepository.ContractAddressProjection> addrOpt =
+                                contractRepository.findContractAddressFields(c.getId());
+
+                        if (addrOpt.isPresent()) {
+                            AcntContractRepository.ContractAddressProjection addr = addrOpt.get();
+
+                            addressLine1 = addr.getAddressLine1();
+                            city = addr.getCity();
+                            country = addr.getCountry();
+                        }
+                    }
+
                     return com.payment.service.dto.response.ContractNodeResponse.builder()
                             .id(c.getId())
                             .contractNumber(c.getContractNumber())
@@ -155,10 +201,13 @@ public class ClientService {
                             .totalBalance(c.getTotalBalance())
                             .dateOpen(c.getDateOpen())
                             .dateExpire(c.getDateExpire())
+                            .addressLine1(addressLine1)
+                            .city(city)
+                            .country(country)
                             .build();
                 })
                 .collect(java.util.stream.Collectors.toList());
-        
+
         return com.payment.service.dto.response.ClientHierarchyResponse.builder()
                 .client(clientResponse)
                 .contracts(nodes)

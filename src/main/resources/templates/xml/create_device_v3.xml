@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:wsin="http://www.openwaygroup.com/wsint"
+                  xmlns:th="http://www.thymeleaf.org">
+    <soapenv:Header>
+        <wsin:SessionContextStr th:text="${sessionContextStr}">?</wsin:SessionContextStr>
+        <wsin:UserInfo th:text="${userInfo}">officer="WX_ADMIN"</wsin:UserInfo>
+        <wsin:CorrelationId th:text="${correlationId}">?</wsin:CorrelationId>
+    </soapenv:Header>
+    <soapenv:Body>
+        <wsin:CreateDeviceV3>
+            <wsin:Reason th:text="${request.reason}">Create POS Terminal via Postman</wsin:Reason>
+            <wsin:ContractSearchMethod th:text="${request.contractSearchMethod}">CONTRACT_NUMBER</wsin:ContractSearchMethod>
+            <wsin:ContractIdentifier th:text="${request.contractIdentifier}">ACQ-CTR-01</wsin:ContractIdentifier>
+            <wsin:DeviceTypeCode th:text="${request.deviceTypeCode}">OLIVETTY</wsin:DeviceTypeCode>
+            <wsin:EnableImmediately th:text="${request.enableImmediately}">Y</wsin:EnableImmediately>
+            <wsin:ProductCode th:text="${request.productCode}">RETAIL_TERMINAL</wsin:ProductCode>
+            <wsin:InObject>
+                <wsin:SerialNumber th:text="${request.inObject.serialNumber}">SN-POS-12345678</wsin:SerialNumber>
+                <wsin:DefaultCurrency th:text="${request.inObject.defaultCurrency}">810</wsin:DefaultCurrency>
+                <wsin:StartTime th:text="${request.inObject.startTime}">0000</wsin:StartTime>
+                <wsin:EndTime th:text="${request.inObject.endTime}">2359</wsin:EndTime>
+                <wsin:CutOffTime th:text="${request.inObject.cutOffTime}">2300</wsin:CutOffTime>
+                <wsin:TransactionClass th:text="${request.inObject.transactionClass}">R</wsin:TransactionClass>
+            </wsin:InObject>
+        </wsin:CreateDeviceV3>
+    </soapenv:Body>
+</soapenv:Envelope>

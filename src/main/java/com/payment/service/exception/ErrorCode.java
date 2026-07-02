@@ -18,6 +18,7 @@ public enum ErrorCode {
     CBS_NUMBER_ALREADY_EXISTS("CTR_03", "Số CBSNumber đã tồn tại trong hệ thống", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND("PRD_01", "Sản phẩm không tồn tại hoặc không phù hợp", HttpStatus.BAD_REQUEST),
     MCC_NOT_FOUND("MCC_01", "Mã ngành nghề MCC (SIC) không tồn tại hoặc không được phép sử dụng", HttpStatus.BAD_REQUEST),
+    CURRENCY_NOT_FOUND("CUR_01", "Mã tiền tệ không tồn tại hoặc không hoạt động", HttpStatus.BAD_REQUEST),
 
     // Security Error Codes
     AUTHENTICATION_FAILED("SEC_01", "Xác thực thất bại", HttpStatus.UNAUTHORIZED),

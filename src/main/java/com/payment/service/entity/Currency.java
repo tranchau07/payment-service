@@ -20,15 +20,15 @@ public class Currency extends BaseEntity {
     @Column(name = "ID")
     Long id;
 
-    @Column(name = "NAME", length = 255)
+    @Column(name = "FULL_NAME", length = 32)
     String name;
 
-    @Column(name = "CODE", length = 3)
+    @Column(name = "NAME", length = 3)
     String code;
 
-    @Column(name = "N_CODE", length = 3)
+    @Column(name = "CODE", length = 3)
     String numericCode;
 
-    @Column(name = "IS_ACTIVE", length = 1)
+    @Column(name = "USE_IN_BANK", length = 1)
     String isActive;
 }

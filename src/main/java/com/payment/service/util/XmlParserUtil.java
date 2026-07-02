@@ -220,4 +220,37 @@ public class XmlParserUtil {
             throw new RuntimeException("Error parsing XML response", e);
         }
     }
+
+    public static com.payment.service.dto.response.CreateDeviceResponse parseCreateDeviceResponse(String xml) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(xml)));
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+
+            String deviceContractId = xPath.evaluate("//DeviceContractID", doc);
+            String deviceContractNumber = xPath.evaluate("//DeviceContractNumber", doc);
+            String deviceNumber = xPath.evaluate("//DeviceNumber", doc);
+            String appNumber = xPath.evaluate("//ApplicationNumber", doc);
+            String retCode = xPath.evaluate("//RetCode", doc);
+            String retMsg = xPath.evaluate("//RetMsg", doc);
+            String debugInfo = xPath.evaluate("//DebugInfo", doc);
+            String resultInfo = xPath.evaluate("//ResultInfo", doc);
+
+            return com.payment.service.dto.response.CreateDeviceResponse.builder()
+                    .deviceContractId(deviceContractId.isEmpty() ? null : Long.parseLong(deviceContractId))
+                    .deviceContractNumber(deviceContractNumber)
+                    .deviceNumber(deviceNumber)
+                    .applicationNumber(appNumber)
+                    .retCode(retCode.isEmpty() ? null : Long.parseLong(retCode))
+                    .retMsg(retMsg)
+                    .debugInfo(debugInfo)
+                    .resultInfo(resultInfo)
+                    .build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing XML response", e);
+        }
+    }
 }

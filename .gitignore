@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local acquiring idempotency journal (use a persistent volume in deployed environments)
+data/acquiring-workflows/

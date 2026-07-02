@@ -116,11 +116,11 @@ public class SoapPayloadBuilderService {
         return xmlTemplateEngine.process("create_acquiring_contract_v2", context);
     }
 
-    public String buildCreateAcquiringContractAddressPayload(String contractNumber, com.payment.service.dto.request.CreateAcquiringContractRequest.AddressObject address, String correlationId) {
+    public String buildCreateAcquiringContractAddressPayload(String contractNumber, com.payment.service.dto.request.CreateAcquiringContractAddressRequest address, String correlationId) {
         Context context = new Context();
         context.setVariable("contractNumber", contractNumber);
         context.setVariable("address", address);
-        context.setVariable("reason", "Create Acquiring Contract Address");
+        context.setVariable("reason", address.getReason());
         context.setVariable("sessionContextStr", "");
         context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
         context.setVariable("correlationId", correlationId);
@@ -128,5 +128,17 @@ public class SoapPayloadBuilderService {
         log.info("Building SOAP payload for CreateAcquiringContractAddress. CorrelationID: {}", correlationId);
 
         return xmlTemplateEngine.process("create_acquiring_contract_address", context);
+    }
+
+    public String buildCreateDevicePayload(com.payment.service.dto.request.CreateDeviceRequest request, String correlationId) {
+        Context context = new Context();
+        context.setVariable("request", request);
+        context.setVariable("sessionContextStr", "");
+        context.setVariable("userInfo", "officer=\"WX_ADMIN\"");
+        context.setVariable("correlationId", correlationId);
+
+        log.info("Building SOAP payload for CreateDeviceV3. CorrelationID: {}", correlationId);
+
+        return xmlTemplateEngine.process("create_device_v3", context);
     }
 }

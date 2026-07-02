@@ -8,16 +8,16 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateAcquiringContractResponse {
-    Long createdContract;
-    String contractNumber;
+public class CreateDeviceResponse {
+    Long deviceContractId;
+    String deviceContractNumber;
+    String deviceNumber;
     String applicationNumber;
-    String cbsNumber;
-    String cbsId;
     Long retCode;
     String retMsg;
     String debugInfo;
     String resultInfo;
+
     public boolean isSuccess() {
         return retCode != null && retCode == 0;
     }

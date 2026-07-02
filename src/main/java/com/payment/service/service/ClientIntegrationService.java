@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.UUID;
+import com.payment.service.exception.CoreIntegrationException;
 
 @Service
 @RequiredArgsConstructor
@@ -127,7 +128,7 @@ public class ClientIntegrationService {
 
         } catch (Exception e) {
             log.error("Lỗi khi kết nối SOAP cho CorrelationID: {}. Lỗi: {}", correlationId, e.getMessage());
-            throw new RuntimeException("Lỗi tích hợp hệ thống Core: " + e.getMessage(), e);
+            throw new CoreIntegrationException(correlationId, e);
         }
     }
 
@@ -179,7 +180,12 @@ public class ClientIntegrationService {
         String merchantXmlPayload = payloadBuilderService.buildCreateMerchantPayload(request, correlationId);
         String merchantXmlResponse = sendSoapRequest(merchantXmlPayload, correlationId);
 
-        CreateMerchantResponse merchantResponse = XmlParserUtil.parseCreateMerchantResponse(merchantXmlResponse);
+        CreateMerchantResponse merchantResponse;
+        try {
+            merchantResponse = XmlParserUtil.parseCreateMerchantResponse(merchantXmlResponse);
+        } catch (RuntimeException ex) {
+            throw new CoreIntegrationException(correlationId, ex);
+        }
 
         if (!merchantResponse.isSuccess()) {
             log.error("Tạo Merchant thất bại: {}. CorrelationID: {}", merchantResponse.getRetMsg(), correlationId);
@@ -203,7 +209,12 @@ public class ClientIntegrationService {
         String xmlPayload = payloadBuilderService.buildCreateAcquiringContractV2Payload(request, correlationId);
         String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
 
-        com.payment.service.dto.response.CreateAcquiringContractResponse response = XmlParserUtil.parseCreateAcquiringContractV2Response(xmlResponse);
+        com.payment.service.dto.response.CreateAcquiringContractResponse response;
+        try {
+            response = XmlParserUtil.parseCreateAcquiringContractV2Response(xmlResponse);
+        } catch (RuntimeException ex) {
+            throw new CoreIntegrationException(correlationId, ex);
+        }
         if (!response.isSuccess()) {
             log.error("Tạo hợp đồng Acquiring qua SOAP thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
             throw new com.payment.service.exception.AppException(
@@ -216,18 +227,48 @@ public class ClientIntegrationService {
         return response;
     }
 
-    public com.payment.service.dto.response.CreateAcquiringContractAddressResponse createAcquiringContractAddress(String contractNumber, com.payment.service.dto.request.CreateAcquiringContractRequest.AddressObject address, String correlationId) {
+    public com.payment.service.dto.response.CreateAcquiringContractAddressResponse createAcquiringContractAddress(String contractNumber, com.payment.service.dto.request.CreateAcquiringContractAddressRequest address, String correlationId) {
         log.info("Bắt đầu tạo địa chỉ hợp đồng Acquiring qua SOAP. CorrelationID: {}", correlationId);
         String xmlPayload = payloadBuilderService.buildCreateAcquiringContractAddressPayload(contractNumber, address, correlationId);
         String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
 
-        com.payment.service.dto.response.CreateAcquiringContractAddressResponse response = XmlParserUtil.parseCreateAcquiringContractAddressResponse(xmlResponse);
+        com.payment.service.dto.response.CreateAcquiringContractAddressResponse response;
+        try {
+            response = XmlParserUtil.parseCreateAcquiringContractAddressResponse(xmlResponse);
+        } catch (RuntimeException ex) {
+            throw new CoreIntegrationException(correlationId, ex);
+        }
         if (!response.isSuccess()) {
             log.error("Tạo địa chỉ hợp đồng Acquiring thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
             throw new com.payment.service.exception.AppException(
                 com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED,
                 correlationId,
                 "Tạo địa chỉ hợp đồng Acquiring thất bại: " + response.getRetMsg(),
+                response.getRetMsg()
+            );
+        }
+        return response;
+    }
+
+    public com.payment.service.dto.response.CreateDeviceResponse createDevice(com.payment.service.dto.request.CreateDeviceRequest request) {
+        String correlationId = UUID.randomUUID().toString();
+        log.info("Bắt đầu tạo Device qua SOAP. CorrelationID: {}", correlationId);
+
+        String xmlPayload = payloadBuilderService.buildCreateDevicePayload(request, correlationId);
+        String xmlResponse = sendSoapRequest(xmlPayload, correlationId);
+
+        com.payment.service.dto.response.CreateDeviceResponse response;
+        try {
+            response = XmlParserUtil.parseCreateDeviceResponse(xmlResponse);
+        } catch (RuntimeException ex) {
+            throw new CoreIntegrationException(correlationId, ex);
+        }
+        if (!response.isSuccess()) {
+            log.error("Tạo Device qua SOAP thất bại: {}. CorrelationID: {}", response.getRetMsg(), correlationId);
+            throw new com.payment.service.exception.AppException(
+                com.payment.service.exception.ErrorCode.CORE_CONTRACT_CREATION_FAILED,
+                correlationId,
+                "Tạo Device thất bại: " + response.getRetMsg(),
                 response.getRetMsg()
             );
         }

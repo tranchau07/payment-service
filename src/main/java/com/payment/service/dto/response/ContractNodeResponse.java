@@ -31,4 +31,8 @@ public class ContractNodeResponse {
     BigDecimal totalBalance;
     Date dateOpen;
     Date dateExpire;
+
+    String addressLine1;
+    String city;
+    String country;
 }
